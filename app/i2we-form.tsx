@@ -8,24 +8,21 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { router } from 'expo-router';
-import { ChevronLeft, User, Calendar } from 'lucide-react-native';
+import { useFormFields, keyboardDismissProps } from '@/hooks/useFormFields';
+import { ChevronLeft, Calendar } from 'lucide-react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { colors, spacing } from '@/constants/theme';
 import { I2WEService } from '@/services/i2weService';
-import { LinksService } from '@/services/linksService';
-import { UserProfile } from '@/types/database';
+import MemberPicker, { PickedMember } from '@/components/shared/MemberPicker';
 import { sendI2WEMeetingRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function I2WEForm() {
   const { profile } = useAuth();
-  const [selectedMember, setSelectedMember] = useState<UserProfile | null>(null);
-  const [selectedHouse, setSelectedHouse] = useState<any>(null);
-  const [houseMembers, setHouseMembers] = useState<UserProfile[]>([]);
-  const [houses, setHouses] = useState<any[]>([]);
-  const [showMemberPicker, setShowMemberPicker] = useState(false);
+  const { field, toolbar } = useFormFields(['notes']);
+  const [selectedMember, setSelectedMember] = useState<PickedMember | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -50,38 +47,6 @@ export default function I2WEForm() {
     () => formatDateForInput(maximumMeetingDate),
     [maximumMeetingDate]
   );
-
-  useEffect(() => {
-    loadUserHouses();
-  }, []);
-
-  useEffect(() => {
-    if (selectedHouse) {
-      loadHouseMembers();
-    }
-  }, [selectedHouse]);
-
-  const loadUserHouses = async () => {
-    try {
-      const data = await LinksService.getUserHouses();
-      setHouses(data);
-      if (data.length > 0) {
-        setSelectedHouse(data[0]);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load houses');
-    }
-  };
-
-  const loadHouseMembers = async () => {
-    if (!selectedHouse) return;
-    try {
-      const members = await I2WEService.getHouseMembers(selectedHouse.id);
-      setHouseMembers(members);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load members');
-    }
-  };
 
   const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
@@ -168,14 +133,17 @@ export default function I2WEForm() {
         <TouchableOpacity onPress={() => router.replace('/(tabs)')} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.text_primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Log I2WE Meeting</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          Log I2WE Meeting
+        </Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         nestedScrollEnabled
-        keyboardShouldPersistTaps="handled">
+        {...keyboardDismissProps}>
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>I2WE - I to WE</Text>
           <Text style={styles.infoDescription}>
@@ -183,39 +151,7 @@ export default function I2WEForm() {
           </Text>
         </View>
 
-        <Text style={styles.label}>
-          Meet with <Text style={styles.required}>*</Text>
-        </Text>
-        <TouchableOpacity
-          style={styles.picker}
-          onPress={() => setShowMemberPicker(!showMemberPicker)}>
-          <User size={20} color={colors.text_secondary} />
-          <Text style={styles.pickerText}>
-            {selectedMember ? selectedMember.full_name : 'Choose Member'}
-          </Text>
-        </TouchableOpacity>
-
-        {showMemberPicker && (
-          <ScrollView
-            style={styles.memberList}
-            nestedScrollEnabled
-            keyboardShouldPersistTaps="handled">
-            {houseMembers.map((member) => (
-              <TouchableOpacity
-                key={member.id}
-                style={styles.memberItem}
-                onPress={() => {
-                  setSelectedMember(member);
-                  setShowMemberPicker(false);
-                }}>
-                <Text style={styles.memberName}>{member.full_name}</Text>
-                <Text style={styles.memberDetails}>
-                  {member.business_category} • {member.city}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        )}
+        <MemberPicker label="Meet with" value={selectedMember} onChange={setSelectedMember} />
 
         <Text style={styles.label}>
           Meeting Date <Text style={styles.required}>*</Text>
@@ -266,6 +202,7 @@ export default function I2WEForm() {
         <Text style={styles.label}>Meeting Notes</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
+          {...field('notes', { multiline: true })}
           placeholder="Add meeting agenda, topics to discuss..."
           placeholderTextColor={colors.text_tertiary}
           value={formData.notes}
@@ -278,6 +215,7 @@ export default function I2WEForm() {
           <Text style={styles.submitButtonText}>Save Meeting</Text>
         </TouchableOpacity>
       </ScrollView>
+      {toolbar}
     </View>
   );
 }
@@ -296,14 +234,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card_background,
   },
   backButton: {
-    padding: spacing.sm,
-    marginRight: spacing.md,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 40,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: colors.text_primary,
     flex: 1,
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
@@ -414,7 +358,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
     backgroundColor: 'transparent',
     borderWidth: 0,
-    outlineStyle: 'none',
+    outlineStyle: 'none' as any,
     color: colors.text_primary,
     fontSize: 16,
     height: 44,

@@ -12,7 +12,9 @@
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://vlwppdpodavowfnyhtkh.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA"
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA",
+        "EXPO_PUBLIC_VAPI_PUBLIC_KEY": "8cb32723-3048-4a29-a0d7-994c1c38acd1",
+        "EXPO_PUBLIC_VAPI_ASSISTANT_ID": "3f1e8a79-f0a6-4d46-b3cd-19ef749dc0f8"
       }
     },
     "preview": {
@@ -25,7 +27,9 @@
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://vlwppdpodavowfnyhtkh.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA"
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA",
+        "EXPO_PUBLIC_VAPI_PUBLIC_KEY": "8cb32723-3048-4a29-a0d7-994c1c38acd1",
+        "EXPO_PUBLIC_VAPI_ASSISTANT_ID": "3f1e8a79-f0a6-4d46-b3cd-19ef749dc0f8"
       }
     },
     "production": {
@@ -37,14 +41,16 @@
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://vlwppdpodavowfnyhtkh.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA"
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZsd3BwZHBvZGF2b3dmbnlodGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMjE4NTcsImV4cCI6MjA4NTY5Nzg1N30.OaEap83s2sxAbuTnyhNVKZnZJwvifLyy9kIBm7rikrA",
+        "EXPO_PUBLIC_VAPI_PUBLIC_KEY": "8cb32723-3048-4a29-a0d7-994c1c38acd1",
+        "EXPO_PUBLIC_VAPI_ASSISTANT_ID": "3f1e8a79-f0a6-4d46-b3cd-19ef749dc0f8"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "wevysyatechnology@gmail.com",
+        "appleId": "princeanilgupta7@gmail.com",
         "ascAppId": "6760703106",
         "appleTeamId": "Q8K8U4XH5D"
       }

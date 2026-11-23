@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { User as UserIcon } from 'lucide-react-native';
+import { User as UserIcon, Home } from 'lucide-react-native';
 import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
 import type { User } from '@/types';
 import ProfilePictureUploader from './ProfilePictureUploader';
@@ -43,6 +43,12 @@ export default function ProfileHeader({ user, onPhotoUpdated }: ProfileHeaderPro
 
       <Text style={styles.name}>{user.name}</Text>
       <Text style={styles.category}>{user.category}</Text>
+      {user.house_name ? (
+        <View style={styles.houseRow}>
+          <Home size={14} color={colors.text_secondary} />
+          <Text style={styles.houseText}>House: {user.house_name}</Text>
+        </View>
+      ) : null}
       <Text style={styles.location}>{user.location}</Text>
 
       <View style={[styles.badge, { backgroundColor: getBadgeColor() + '20' }]}>
@@ -100,6 +106,17 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     color: colors.accent_green_bright,
     marginBottom: spacing.xs,
+  },
+  houseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  houseText: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: fontSize.sm,
+    color: colors.text_primary,
   },
   location: {
     fontFamily: 'Poppins-Regular',

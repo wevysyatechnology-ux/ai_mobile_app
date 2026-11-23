@@ -19,6 +19,8 @@ import {
   CheckCircle,
   ExternalLink,
   AlertCircle,
+  ScanLine,
+  Mic,
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/constants/theme';
 import { EventsService, EventMeeting } from '@/services/eventsService';
@@ -79,7 +81,12 @@ export default function EventDetail() {
           <ChevronLeft size={22} color={colors.text_primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Event Detail</Text>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity
+          style={styles.scanBtn}
+          onPress={() => router.push('/attendance-scan' as any)}
+          activeOpacity={0.85}>
+          <ScanLine size={18} color={colors.accent_green_bright} />
+        </TouchableOpacity>
       </View>
 
       {isLoading ? (
@@ -177,6 +184,20 @@ export default function EventDetail() {
             </TouchableOpacity>
           ) : null}
 
+          {/* Summarize this meeting */}
+          <TouchableOpacity
+            style={styles.summarizeBtn}
+            onPress={() =>
+              router.push({
+                pathname: '/voice-notes',
+                params: { type: 'meeting_summary', title: `${event.title || 'Event'} — Summary` },
+              })
+            }
+            activeOpacity={0.85}>
+            <Mic size={16} color={colors.accent_green_bright} />
+            <Text style={styles.summarizeBtnText}>Summarize This Meeting</Text>
+          </TouchableOpacity>
+
           {/* View all events */}
           <TouchableOpacity
             style={styles.allEventsBtn}
@@ -266,7 +287,16 @@ const styles = StyleSheet.create({
     color: colors.text_primary,
     textAlign: 'center',
   },
-  headerSpacer: { width: 36 },
+  scanBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(52,211,153,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(52,211,153,0.2)',
+  },
 
   centered: {
     flex: 1,
@@ -415,6 +445,24 @@ const styles = StyleSheet.create({
     color: colors.bg_primary,
     flex: 1,
     textAlign: 'center',
+  },
+
+  summarizeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(52,211,153,0.1)',
+    borderRadius: borderRadius.button,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(52,211,153,0.25)',
+  },
+  summarizeBtnText: {
+    fontFamily: fontFamily.semiBold,
+    fontSize: fontSize.sm,
+    color: colors.accent_green_bright,
   },
 
   // View all events

@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
+import { getVersionLabel } from '@/utils/appVersion';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -144,7 +145,13 @@ export default function LoginScreen() {
     } else {
       let errorMsg = result.error || 'Failed to sign in';
       if (errorMsg.includes('Invalid login credentials')) {
-        errorMsg = 'Account does not exist. Please contact admin to create your account.';
+        // Supabase returns this exact same generic message for BOTH a wrong
+        // password and a non-existent email — it deliberately doesn't
+        // distinguish the two (prevents attackers from discovering which
+        // emails are registered). Don't claim "account does not exist" here;
+        // that's simply wrong whenever the email is valid but the password
+        // isn't, which is the common case.
+        errorMsg = 'Incorrect email or password. Please try again, or contact admin if you need help.';
       }
       // Show membership restriction errors as a prominent Alert popup
       if (errorMsg.toLowerCase().includes('contact your administrator')) {
@@ -276,6 +283,14 @@ export default function LoginScreen() {
                   />
                 </View>
 
+                <TouchableOpacity
+                  onPress={() => router.push('/auth/forgot-password')}
+                  style={styles.forgotPasswordContainer}
+                  disabled={isLoading}>
+                  <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                </TouchableOpacity>
+
+
                 {error ? (
                   <Text style={styles.errorText}>{error}</Text>
                 ) : null}
@@ -299,6 +314,8 @@ export default function LoginScreen() {
                     <Text style={styles.signupLink}>Create Account</Text>
                   </TouchableOpacity>
                 </View>
+
+                <Text style={styles.versionText}>{getVersionLabel()}</Text>
             </>
           </Animated.View>
         </View>
@@ -308,6 +325,13 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  versionText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 12,
+    color: colors.text_muted,
+    textAlign: 'center',
+    marginTop: 24,
+  },
   container: {
     flex: 1,
   },
@@ -421,6 +445,17 @@ const styles = StyleSheet.create({
     color: colors.text_muted,
   },
   signupLink: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    color: colors.accent_green_bright,
+  },
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+    marginTop: -8,
+    paddingHorizontal: 4,
+  },
+  forgotPasswordText: {
     fontFamily: 'Poppins-Medium',
     fontSize: 14,
     color: colors.accent_green_bright,

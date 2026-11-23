@@ -1,7 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Linking } from 'react-native';
-import { Phone, User as UserIcon } from 'lucide-react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
+import { User as UserIcon, UserPlus } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
+import { ConnectionsService } from '@/services/connectionsService';
 import type { User } from '@/types';
 
 interface MemberCardProps {
@@ -10,8 +12,7 @@ interface MemberCardProps {
 
 export default function MemberCard({ member }: MemberCardProps) {
   const router = useRouter();
-  const phoneNumber = member.phone_number?.trim() || '';
-  const canCall = phoneNumber.length > 0;
+  const [connecting, setConnecting] = useState(false);
 
   const handleViewProfile = () => {
     router.push({
@@ -23,25 +24,26 @@ export default function MemberCard({ member }: MemberCardProps) {
         location: member.location,
         circle: member.circle,
         tier: member.tier,
-        phone_number: phoneNumber,
         profile_photo: member.profile_photo || '',
       },
     });
   };
 
-  const handleCall = async () => {
-    if (!canCall) {
-      Alert.alert('Phone unavailable', 'No phone number is available for this member.');
-      return;
-    }
-
-    const dialableNumber = phoneNumber.replace(/\s+/g, '');
-    const dialUrl = `tel:${dialableNumber}`;
-
+  const handleConnect = async () => {
+    setConnecting(true);
     try {
-      await Linking.openURL(dialUrl);
-    } catch {
-      Alert.alert('Unable to call', 'Could not open the phone dialer.');
+      const connection = await ConnectionsService.sendConnectRequest(member.id);
+      if (connection.status === 'accepted') {
+        Alert.alert("You're already connected", `You're already connected with ${member.name}.`);
+      } else if (connection.status === 'declined') {
+        Alert.alert('Not connected', `A connection with ${member.name} was previously declined.`);
+      } else {
+        Alert.alert('Request sent', `Connect request sent to ${member.name}.`);
+      }
+    } catch (error: any) {
+      Alert.alert('Error', error?.message || 'Could not send connect request.');
+    } finally {
+      setConnecting(false);
     }
   };
 
@@ -98,17 +100,15 @@ export default function MemberCard({ member }: MemberCardProps) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.callButton,
-            !canCall && styles.callButtonDisabled,
-          ]}
-          disabled={!canCall}
-          onPress={handleCall}
+          style={styles.connectButton}
+          onPress={handleConnect}
+          disabled={connecting}
           activeOpacity={0.7}>
-          <Phone
-            size={16}
-            color={canCall ? colors.bg_primary : colors.text_secondary}
-          />
+          {connecting ? (
+            <ActivityIndicator size="small" color={colors.bg_primary} />
+          ) : (
+            <UserPlus size={16} color={colors.bg_primary} />
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -201,15 +201,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     color: colors.bg_primary,
   },
-  callButton: {
+  connectButton: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.button,
     backgroundColor: colors.accent_green_bright,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  callButtonDisabled: {
-    backgroundColor: colors.bg_secondary,
   },
 });

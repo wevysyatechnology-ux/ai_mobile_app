@@ -3,7 +3,11 @@ export interface User {
   name: string;
   email: string;
   phone_number?: string | null;
+  membership_code?: string | null;
+  /** Date of joining (YYYY-MM-DD); falls back to created_at when unknown. */
+  member_since?: string | null;
   category: string;
+  house_name?: string | null;
   location: string;
   circle: 'inner' | 'open';
   tier: 'regular' | 'privileged' | 'virtual';

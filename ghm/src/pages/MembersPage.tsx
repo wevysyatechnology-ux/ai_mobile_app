@@ -6,6 +6,7 @@ export default function MembersPage() {
   const [members, setMembers] = useState<MemberWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'inner_circle' | 'open_circle'>('all');
+  const [updatingAccessId, setUpdatingAccessId] = useState<string | null>(null);
 
   useEffect(() => {
     loadMembers();
@@ -19,6 +20,23 @@ export default function MembersPage() {
       console.error('Error loading members:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleToggleMobileAppAccess(member: MemberWithDetails) {
+    const next = !member.mobile_app_access;
+    setUpdatingAccessId(member.id);
+    // Optimistic update, reverted below if the write fails (e.g. an
+    // admin-scoped RLS policy for users_profile turns out not to exist yet).
+    setMembers((prev) => prev.map((m) => (m.id === member.id ? { ...m, mobile_app_access: next } : m)));
+    try {
+      await membersService.setMobileAppAccess(member.id, next);
+    } catch (error) {
+      console.error('Error updating mobile app access:', error);
+      setMembers((prev) => prev.map((m) => (m.id === member.id ? { ...m, mobile_app_access: !next } : m)));
+      alert('Could not update Mobile App Access. Please try again.');
+    } finally {
+      setUpdatingAccessId(null);
     }
   }
 
@@ -108,6 +126,7 @@ export default function MembersPage() {
                 <th style={tableHeaderStyle}>House</th>
                 <th style={tableHeaderStyle}>Attendance</th>
                 <th style={tableHeaderStyle}>Status</th>
+                <th style={tableHeaderStyle}>Mobile App Access</th>
               </tr>
             </thead>
             <tbody>
@@ -174,6 +193,27 @@ export default function MembersPage() {
                         Active
                       </span>
                     )}
+                  </td>
+                  <td style={tableCellStyle}>
+                    <label
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        cursor: updatingAccessId === member.id ? 'wait' : 'pointer',
+                        opacity: updatingAccessId === member.id ? 0.6 : 1,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={member.mobile_app_access}
+                        disabled={updatingAccessId === member.id}
+                        onChange={() => handleToggleMobileAppAccess(member)}
+                      />
+                      <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
+                        {member.mobile_app_access ? 'Enabled' : 'Disabled'}
+                      </span>
+                    </label>
                   </td>
                 </tr>
               ))}

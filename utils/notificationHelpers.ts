@@ -122,7 +122,7 @@ export async function sendDealRecordedNotification(params: {
   return sendNotification({
     userId: params.recipientId,
     type: 'deal_recorded',
-    title: '💰 Deal Recorded',
+    title: '₹ Deal Recorded',
     body: `${params.memberName} has recorded a deal with you worth ${params.currency}${params.amount.toLocaleString()}.`,
     data: {
       dealId: params.dealId,
@@ -397,6 +397,126 @@ export async function sendEventCreatedNotification(params: {
       location: params.location,
       meetingLink: params.meetingLink,
       meetingType: params.eventLevel || 'house',
+    },
+    priority: 'high',
+  });
+}
+
+/**
+ * 🤝 Send Connect Request Notification
+ */
+export async function sendConnectRequestNotification(params: {
+  recipientId: string;
+  connectionId: string;
+  requesterName: string;
+  requesterId: string;
+}): Promise<boolean> {
+  return sendNotification({
+    userId: params.recipientId,
+    type: 'connect_request',
+    title: '🤝 New Connect Request',
+    body: `${params.requesterName} wants to connect with you.`,
+    data: {
+      connectionId: params.connectionId,
+      requesterName: params.requesterName,
+      requesterId: params.requesterId,
+    },
+    priority: 'high',
+  });
+}
+
+/**
+ * ✅ Send Connect Accepted Notification
+ */
+export async function sendConnectAcceptedNotification(params: {
+  recipientId: string;
+  connectionId: string;
+  accepterName: string;
+  accepterId: string;
+}): Promise<boolean> {
+  return sendNotification({
+    userId: params.recipientId,
+    type: 'connect_accepted',
+    title: '✅ Connection Accepted',
+    body: `${params.accepterName} accepted your connect request. Start chatting!`,
+    data: {
+      connectionId: params.connectionId,
+      accepterName: params.accepterName,
+      accepterId: params.accepterId,
+    },
+    priority: 'high',
+  });
+}
+
+/**
+ * Send Connect Declined Notification
+ */
+export async function sendConnectDeclinedNotification(params: {
+  recipientId: string;
+  connectionId: string;
+  declinerName: string;
+}): Promise<boolean> {
+  return sendNotification({
+    userId: params.recipientId,
+    type: 'connect_declined',
+    title: 'Connect Request Declined',
+    body: `${params.declinerName} declined your connect request.`,
+    data: {
+      connectionId: params.connectionId,
+      declinerName: params.declinerName,
+    },
+    priority: 'normal',
+  });
+}
+
+/**
+ * 💬 Send New Message Notification
+ */
+export async function sendNewMessageNotification(params: {
+  recipientId: string;
+  connectionId: string;
+  senderName: string;
+  senderId: string;
+  preview: string;
+}): Promise<boolean> {
+  const truncatedPreview =
+    params.preview.length > 80 ? `${params.preview.slice(0, 80)}…` : params.preview;
+
+  return sendNotification({
+    userId: params.recipientId,
+    type: 'new_message',
+    title: `💬 New message from ${params.senderName}`,
+    body: truncatedPreview,
+    data: {
+      connectionId: params.connectionId,
+      senderName: params.senderName,
+      senderId: params.senderId,
+      preview: truncatedPreview,
+    },
+    priority: 'normal',
+  });
+}
+
+/**
+ * 📞 Send Incoming Call Notification
+ */
+export async function sendIncomingCallNotification(params: {
+  recipientId: string;
+  callId: string;
+  connectionId: string;
+  callerName: string;
+  callerId: string;
+}): Promise<boolean> {
+  return sendNotification({
+    userId: params.recipientId,
+    type: 'incoming_call',
+    title: '📞 Incoming call',
+    body: `${params.callerName} is calling you.`,
+    data: {
+      callId: params.callId,
+      connectionId: params.connectionId,
+      callerName: params.callerName,
+      callerId: params.callerId,
     },
     priority: 'high',
   });

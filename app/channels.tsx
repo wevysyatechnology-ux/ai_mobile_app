@@ -158,6 +158,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerTitle: {
+    flex: 1,
+    textAlign: 'center',
     fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: '600',
     color: COLORS.text,

@@ -1,0 +1,45 @@
+# dependencies (any depth, incl. the ghm web portal folder)
+node_modules/
+**/node_modules/
+
+# local env files (loaded via eas.json env instead)
+.env*.local
+.env
+
+# android build artifacts and caches
+android/app/build/
+android/build/
+android/.gradle/
+android/.cxx/
+**/.cxx/
+android/.kotlin/
+android/local.properties
+
+# ios build artifacts and caches
+ios/build/
+ios/Pods/
+ios/.xcode.env.local
+
+# expo build outputs
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# media or other large assets that aren't source code
+*.mp4
+*.rec
+*.apk
+*.aab
+*.ipa
+
+# secrets / service account keys
+service-account-file.json
+deployment_cert.der
+
+# IDE and git settings
+.git/
+.vscode/
+.idea/
+.bolt/
+*.tsbuildinfo

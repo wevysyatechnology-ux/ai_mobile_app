@@ -30,7 +30,12 @@ export const DealsService = {
         throw new Error('Failed to get user profile');
       }
 
-      const houseId = profileData?.house_id || null;
+      let houseId: string | null = profileData?.house_id || null;
+      if (!houseId) {
+        // Profile id differs from the login id for some members; resolve the house by login e-mail.
+        const { data: fallbackHouseId } = await supabase.rpc('get_my_house_id_by_login');
+        houseId = (fallbackHouseId as string | null) || null;
+      }
       console.log('User house_id from profiles:', houseId);
 
       const { data, error } = await supabase

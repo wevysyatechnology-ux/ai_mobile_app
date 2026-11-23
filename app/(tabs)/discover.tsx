@@ -1,18 +1,62 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
-import { Link, Handshake, Users, Grid, CalendarClock } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Link, Handshake, Users, Grid, CalendarClock, Search, X, MessageCircle } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import DiscoverSection from '@/components/discover/DiscoverSection';
+import MemberSearchResults from '@/components/discover/MemberSearchResults';
 import FloatingLogo from '@/components/shared/FloatingLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { LinksService } from '@/services/linksService';
 import type { User } from '@/types';
 
+import { keyboardDismissProps } from '@/hooks/useFormFields';
 export default function Discover() {
   const { profile } = useAuth();
+  const params = useLocalSearchParams<{ q?: string; category?: string; city?: string; keyword?: string }>();
   const [houseMembers, setHouseMembers] = useState<User[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [searchFilters, setSearchFilters] = useState<{ profession?: string; location?: string; query?: string; keyword?: string } | null>(null);
+
+  // Seed the search box from voice-driven navigation (?q=&category=&city=&keyword=)
+  useEffect(() => {
+    if (params.category || params.city || params.keyword || params.q) {
+      cancelPendingSearch();
+      setSearchText(params.q || params.category || params.keyword || params.city || '');
+      setSearchFilters({ profession: params.category, location: params.city, keyword: params.keyword });
+    }
+  }, [params.q, params.category, params.city, params.keyword]);
+
+  // Debounce: wait until typing pauses before querying, so "ramesh" is one search, not six.
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelPendingSearch = () => {
+    if (searchTimer.current) {
+      clearTimeout(searchTimer.current);
+      searchTimer.current = null;
+    }
+  };
+  useEffect(() => cancelPendingSearch, []);
+
+  const runSearch = (text: string) => {
+    setSearchText(text);
+    cancelPendingSearch();
+    const trimmed = text.trim();
+    if (!trimmed) {
+      setSearchFilters(null);
+      return;
+    }
+    searchTimer.current = setTimeout(() => {
+      setSearchFilters({ query: trimmed });
+      searchTimer.current = null;
+    }, 400);
+  };
+
+  const clearSearch = () => {
+    cancelPendingSearch();
+    setSearchText('');
+    setSearchFilters(null);
+  };
 
   useEffect(() => {
     const loadHouseMembers = async () => {
@@ -85,18 +129,49 @@ export default function Discover() {
       color: colors.accent_green_bright,
       route: '/event-meetings' as const,
     },
+    {
+      slug: 'connect-requests',
+      icon: MessageCircle,
+      title: 'Connect Requests',
+      subtitle: 'Manage connection requests & chats',
+      color: colors.accent_green_bright,
+      route: '/connect-requests' as const,
+    },
   ];
 
   return (
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+        {...keyboardDismissProps}
         showsVerticalScrollIndicator={false}>
         <View style={styles.headerContainer}>
           <FloatingLogo size="medium" />
           <Text style={styles.header}>Discover</Text>
         </View>
 
+        <View style={styles.searchBarContainer}>
+          <Search size={18} color={colors.text_muted} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search name, profession or city"
+            numberOfLines={1}
+            placeholderTextColor={colors.text_muted}
+            value={searchText}
+            onChangeText={runSearch}
+            returnKeyType="search"
+          />
+          {searchText.length > 0 && (
+            <TouchableOpacity onPress={clearSearch} hitSlop={8}>
+              <X size={18} color={colors.text_muted} />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {searchFilters ? (
+          <MemberSearchResults filters={searchFilters} />
+        ) : (
+        <>
         <View style={styles.quickChannelsContainer}>
           {quickChannels.map((channel) => {
             const IconComponent = channel.icon;
@@ -148,6 +223,8 @@ export default function Discover() {
           members={houseMembers}
           isLoading={membersLoading}
         />
+        </>
+        )}
       </ScrollView>
     </View>
   );
@@ -167,11 +244,31 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   header: {
+    textAlign: 'center',
     fontSize: 42,
     fontWeight: '900',
     color: colors.text_primary,
     letterSpacing: -1,
     marginTop: spacing.lg,
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.bg_secondary,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border_secondary,
+    gap: spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: colors.text_primary,
+    paddingVertical: spacing.sm,
   },
   quickChannelsContainer: {
     flexDirection: 'row',

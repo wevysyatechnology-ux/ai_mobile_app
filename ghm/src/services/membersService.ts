@@ -71,6 +71,10 @@ export const membersService = {
     return this.updateMember(userId, { is_suspended: false });
   },
 
+  async setMobileAppAccess(userId: string, enabled: boolean) {
+    return this.updateMember(userId, { mobile_app_access: enabled });
+  },
+
   async updateVerticalType(userId: string, verticalType: 'inner_circle' | 'open_circle') {
     return this.updateMember(userId, { vertical_type: verticalType });
   },

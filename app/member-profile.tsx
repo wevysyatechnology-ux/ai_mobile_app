@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Linking } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { ChevronLeft, Phone, User as UserIcon } from 'lucide-react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
+import { ChevronLeft, User as UserIcon } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { ConnectionsService, ConnectionSummary } from '@/services/connectionsService';
 
 interface HouseDetails {
   name: string;
@@ -22,7 +23,6 @@ export default function MemberProfileScreen() {
     location?: string;
     circle?: string;
     tier?: string;
-    phone_number?: string;
     profile_photo?: string;
   }>();
 
@@ -32,21 +32,63 @@ export default function MemberProfileScreen() {
   const circle = params.circle || 'open';
   const tier = params.tier || 'regular';
   const profilePhoto = params.profile_photo || '';
-  const phoneNumber = params.phone_number?.trim() || '';
-  const canCall = phoneNumber.length > 0;
   const [houseDetails, setHouseDetails] = useState<HouseDetails | null>(null);
+  const [connection, setConnection] = useState<ConnectionSummary | null>(null);
+  const [connectionLoading, setConnectionLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  const handleCall = async () => {
-    if (!canCall) {
-      Alert.alert('Phone unavailable', 'No phone number is available for this member.');
+  const loadConnection = useCallback(async () => {
+    if (!params.id) {
+      setConnectionLoading(false);
       return;
     }
-    const dialUrl = `tel:${phoneNumber.replace(/\s+/g, '')}`;
     try {
-      await Linking.openURL(dialUrl);
-    } catch {
-      Alert.alert('Unable to call', 'Could not open the phone dialer.');
+      const existing = await ConnectionsService.getConnectionWith(params.id);
+      setConnection(existing);
+    } catch (error) {
+      console.error('Failed to load connection status:', error);
+    } finally {
+      setConnectionLoading(false);
     }
+  }, [params.id]);
+
+  // Refresh on every focus (e.g. returning from the chat/inbox screen after
+  // the other person responded), not just once on mount.
+  useFocusEffect(
+    useCallback(() => {
+      loadConnection();
+    }, [loadConnection])
+  );
+
+  const handleConnect = async () => {
+    if (!params.id) return;
+    setActionLoading(true);
+    try {
+      const result = await ConnectionsService.sendConnectRequest(params.id);
+      setConnection(result);
+    } catch (error: any) {
+      Alert.alert('Error', error?.message || 'Could not send connect request.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRespond = async (accept: boolean) => {
+    if (!connection) return;
+    setActionLoading(true);
+    try {
+      await ConnectionsService.respondToRequest(connection.id, accept);
+      await loadConnection();
+    } catch (error: any) {
+      Alert.alert('Error', error?.message || 'Could not respond to this request.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const openChat = () => {
+    if (!connection) return;
+    router.push({ pathname: '/chat-detail', params: { connectionId: connection.id } });
   };
 
   useEffect(() => {
@@ -104,7 +146,10 @@ export default function MemberProfileScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.text_primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Member Profile</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          Member Profile
+        </Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <View style={styles.content}>
@@ -154,16 +199,54 @@ export default function MemberProfileScreen() {
             </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.callButton, !canCall && styles.callButtonDisabled]}
-            disabled={!canCall}
-            onPress={handleCall}
-            activeOpacity={0.85}>
-            <Phone size={18} color={canCall ? colors.bg_primary : colors.text_secondary} />
-            <Text style={[styles.callText, !canCall && styles.callTextDisabled]}>
-              {canCall ? `Call ${name}` : 'No phone number'}
-            </Text>
-          </TouchableOpacity>
+          {connectionLoading ? (
+            <ActivityIndicator size="small" color={colors.accent_green_bright} />
+          ) : !connection ? (
+            <TouchableOpacity
+              style={styles.connectButton}
+              disabled={actionLoading || !params.id}
+              onPress={handleConnect}
+              activeOpacity={0.85}>
+              {actionLoading ? (
+                <ActivityIndicator size="small" color={colors.bg_primary} />
+              ) : (
+                <Text style={styles.connectButtonText}>Connect</Text>
+              )}
+            </TouchableOpacity>
+          ) : connection.status === 'pending' && connection.isRequester ? (
+            <View style={styles.contactNotice}>
+              <Text style={styles.contactNoticeText}>Request pending — waiting for a response.</Text>
+            </View>
+          ) : connection.status === 'pending' && !connection.isRequester ? (
+            <View style={styles.respondRow}>
+              <TouchableOpacity
+                style={styles.declineButton}
+                disabled={actionLoading}
+                onPress={() => handleRespond(false)}>
+                <Text style={styles.declineButtonText}>Decline</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.acceptButton}
+                disabled={actionLoading}
+                onPress={() => handleRespond(true)}>
+                {actionLoading ? (
+                  <ActivityIndicator size="small" color={colors.bg_primary} />
+                ) : (
+                  <Text style={styles.acceptButtonText}>Accept</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : connection.status === 'accepted' ? (
+            <TouchableOpacity style={styles.connectButton} onPress={openChat} activeOpacity={0.85}>
+              <Text style={styles.connectButtonText}>Open Chat</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.contactNotice}>
+              <Text style={styles.contactNoticeText}>
+                Full contact details unlock after you connect.
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -184,10 +267,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg_secondary,
   },
   backButton: {
-    padding: spacing.sm,
-    marginRight: spacing.md,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 40,
   },
   headerTitle: {
+    flex: 1,
+    textAlign: 'center',
     fontSize: 22,
     fontWeight: '700',
     color: colors.text_primary,
@@ -316,26 +406,62 @@ const styles = StyleSheet.create({
     maxWidth: '62%',
     textAlign: 'right',
   },
-  callButton: {
+  contactNotice: {
     width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     borderRadius: 14,
+    backgroundColor: 'rgba(52, 211, 153, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.2)',
+    alignItems: 'center',
+  },
+  contactNoticeText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 13,
+    color: colors.text_muted,
+    textAlign: 'center',
+  },
+  connectButton: {
+    width: '100%',
+    paddingVertical: spacing.md,
+    borderRadius: 14,
     backgroundColor: colors.accent_green_bright,
+    alignItems: 'center',
   },
-  callButtonDisabled: {
-    backgroundColor: colors.bg_secondary,
-  },
-  callText: {
+  connectButtonText: {
     fontFamily: 'Poppins-SemiBold',
     color: colors.bg_primary,
     fontSize: 15,
   },
-  callTextDisabled: {
+  respondRow: {
+    width: '100%',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  declineButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    borderRadius: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  declineButtonText: {
+    fontFamily: 'Poppins-Medium',
     color: colors.text_secondary,
+    fontSize: 14,
+  },
+  acceptButton: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    borderRadius: 14,
+    alignItems: 'center',
+    backgroundColor: colors.accent_green_bright,
+  },
+  acceptButtonText: {
+    fontFamily: 'Poppins-Medium',
+    color: colors.bg_primary,
+    fontSize: 14,
   },
 });

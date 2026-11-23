@@ -1,59 +1,28 @@
 import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router } from 'expo-router';
-import { ChevronLeft, User } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import { DealsService } from '@/services/dealsService';
-import { LinksService } from '@/services/linksService';
-import { UserProfile } from '@/types/database';
 import { sendDealRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFormFields, keyboardDismissProps } from '@/hooks/useFormFields';
+import MemberPicker, { PickedMember } from '@/components/shared/MemberPicker';
+import SuccessModal from '@/components/shared/SuccessModal';
+import ShareReceiptCard, { ReceiptData, receiptToText } from '@/components/shared/ShareReceiptCard';
+import { format } from 'date-fns';
 
 export default function DealsForm() {
+  const { field, toolbar } = useFormFields(['title', 'description', 'amount']);
   const { profile } = useAuth();
-  const [selectedMember, setSelectedMember] = useState<UserProfile | { id: 'wevysya', full_name: 'WeVysya' } | null>(null);
-  const [selectedHouse, setSelectedHouse] = useState<any>(null);
-  const [houseMembers, setHouseMembers] = useState<UserProfile[]>([]);
-  const [houses, setHouses] = useState<any[]>([]);
-  const [showMemberPicker, setShowMemberPicker] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<PickedMember | null>(null);
+  const [success, setSuccess] = useState<null | { title: string; message: string; details: [string, string][]; receipt?: ReceiptData }>(null);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     amount: '',
   });
-
-  useEffect(() => {
-    loadUserHouses();
-  }, []);
-
-  useEffect(() => {
-    if (selectedHouse) {
-      loadHouseMembers();
-    }
-  }, [selectedHouse]);
-
-  const loadUserHouses = async () => {
-    try {
-      const data = await LinksService.getUserHouses();
-      setHouses(data);
-      if (data.length > 0) {
-        setSelectedHouse(data[0]);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load houses');
-    }
-  };
-
-  const loadHouseMembers = async () => {
-    if (!selectedHouse) return;
-    try {
-      const members = await LinksService.getHouseMembers(selectedHouse.id);
-      setHouseMembers(members);
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load members');
-    }
-  };
 
   const handleSubmit = async () => {
     if (!selectedMember) {
@@ -68,6 +37,7 @@ export default function DealsForm() {
 
     const isWeVysyaDeal = selectedMember.id === 'wevysya';
     const fromMemberId = isWeVysyaDeal ? null : selectedMember.id;
+    const sourceName = selectedMember.full_name;
 
     try {
       const result = await DealsService.createDeal({
@@ -79,7 +49,7 @@ export default function DealsForm() {
       });
 
       // Send notification to the member (if not WeVysya deal)
-      if (!isWeVysyaDeal && selectedMember.id && profile) {
+      if (!isWeVysyaDeal && profile) {
         await sendDealRecordedNotification({
           recipientId: selectedMember.id,
           dealId: result?.id || '',
@@ -91,6 +61,9 @@ export default function DealsForm() {
         });
       }
 
+      const recordedTitle = formData.title;
+      const recordedAmount = parseFloat(formData.amount);
+
       // Clear form
       setFormData({
         title: '',
@@ -99,12 +72,23 @@ export default function DealsForm() {
       });
       setSelectedMember(null);
 
-      Alert.alert('Success', 'Deal created successfully', [
-        {
-          text: 'OK',
-          onPress: () => router.replace('/(tabs)'),
+      setSuccess({
+        title: 'Deal recorded',
+        message: 'Your deal has been recorded successfully.',
+        receipt: {
+          kind: 'deal',
+          headline: `₹${recordedAmount.toLocaleString('en-IN')}`,
+          subline: recordedTitle,
+          rows: [['Received from', sourceName || 'Member']],
+          senderName: profile?.full_name || 'WeVysya member',
+          dateText: format(new Date(), 'dd MMM yyyy, h:mm a'),
         },
-      ]);
+        details: [
+          ['Deal', recordedTitle],
+          ['Amount', `₹${recordedAmount.toLocaleString('en-IN')}`],
+          ['Received from', sourceName || 'Member'],
+        ],
+      });
     } catch (error: any) {
       console.error('Error creating deal:', error);
       Alert.alert('Error', `Failed to create deal: ${error.message || 'Unknown error'}`);
@@ -117,62 +101,30 @@ export default function DealsForm() {
         <TouchableOpacity onPress={() => router.replace('/(tabs)')} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.text_primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Create Deal</Text>
+        <Text style={styles.headerTitle} numberOfLines={1} adjustsFontSizeToFit>
+          Create Deal
+        </Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         nestedScrollEnabled
-        keyboardShouldPersistTaps="handled">
-        <Text style={styles.label}>
-          Received from <Text style={styles.required}>*</Text>
-        </Text>
-        <TouchableOpacity
-          style={styles.picker}
-          onPress={() => setShowMemberPicker(!showMemberPicker)}>
-          <User size={20} color={colors.text_secondary} />
-          <Text style={styles.pickerText}>
-            {selectedMember ? selectedMember.full_name : 'Choose Member'}
-          </Text>
-        </TouchableOpacity>
-
-        {showMemberPicker && (
-          <ScrollView
-            style={styles.memberList}
-            nestedScrollEnabled
-            keyboardShouldPersistTaps="handled">
-            {houseMembers.map((member) => (
-              <TouchableOpacity
-                key={member.id}
-                style={styles.memberItem}
-                onPress={() => {
-                  setSelectedMember(member);
-                  setShowMemberPicker(false);
-                }}>
-                <Text style={styles.memberName}>{member.full_name}</Text>
-                <Text style={styles.memberDetails}>
-                  {member.business_category} • {member.city}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={styles.memberItem}
-              onPress={() => {
-                setSelectedMember({ id: 'wevysya', full_name: 'WeVysya' });
-                setShowMemberPicker(false);
-              }}>
-              <Text style={styles.memberName}>WeVysya</Text>
-              <Text style={styles.memberDetails}>Open to all WeVysya members</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        )}
+        {...keyboardDismissProps}>
+        <MemberPicker
+          label="Received from"
+          value={selectedMember}
+          onChange={setSelectedMember}
+          extraOption={{ id: 'wevysya', full_name: 'WeVysya', description: 'Open to all WeVysya members' }}
+        />
 
         <Text style={styles.label}>
           Title <Text style={styles.required}>*</Text>
         </Text>
         <TextInput
           style={styles.input}
+          {...field('title')}
           placeholder="Deal Title"
           placeholderTextColor={colors.text_tertiary}
           value={formData.title}
@@ -182,6 +134,7 @@ export default function DealsForm() {
         <Text style={styles.label}>Description</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
+          {...field('description', { multiline: true })}
           placeholder="Deal Description"
           placeholderTextColor={colors.text_tertiary}
           value={formData.description}
@@ -195,6 +148,7 @@ export default function DealsForm() {
         </Text>
         <TextInput
           style={styles.input}
+          {...field('amount')}
           placeholder="Deal Amount"
           placeholderTextColor={colors.text_tertiary}
           value={formData.amount}
@@ -206,6 +160,22 @@ export default function DealsForm() {
           <Text style={styles.submitButtonText}>Create Deal</Text>
         </TouchableOpacity>
       </ScrollView>
+      <SuccessModal
+        visible={!!success}
+        title={success?.title || ''}
+        message={success?.message}
+        details={success?.details}
+        receipt={success?.receipt ? <ShareReceiptCard {...success.receipt} /> : undefined}
+        shareText={success?.receipt ? receiptToText(success.receipt) : undefined}
+        primaryLabel="Done"
+        onPrimary={() => {
+          setSuccess(null);
+          router.replace('/(tabs)');
+        }}
+        secondaryLabel="Add another"
+        onSecondary={() => setSuccess(null)}
+      />
+      {toolbar}
     </View>
   );
 }
@@ -224,10 +194,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card_background,
   },
   backButton: {
-    padding: spacing.sm,
-    marginRight: spacing.md,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 40,
   },
   headerTitle: {
+    flex: 1,
+    textAlign: 'center',
     fontSize: 24,
     fontWeight: '700',
     color: colors.text_primary,
@@ -283,6 +260,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
     maxHeight: 200,
+  },
+  memberSearchInput: {
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    margin: spacing.sm,
+    marginBottom: 0,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    fontSize: 14,
+    color: colors.text_primary,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  emptyMemberList: {
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  emptyMemberText: {
+    fontSize: 14,
+    color: colors.text_tertiary,
+    textAlign: 'center',
   },
   memberItem: {
     padding: spacing.md,

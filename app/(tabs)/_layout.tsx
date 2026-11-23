@@ -35,6 +35,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
+          animation: 'fade',
           tabBarHideOnKeyboard: true,
           tabBarStyle: {
             backgroundColor: colors.bg_primary,

@@ -20,6 +20,7 @@ interface AISuggestionItem {
   detail: string;
 }
 
+import { formatLabel } from '@/utils/formatLabel';
 export default function Activity() {
   const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +60,7 @@ export default function Activity() {
           new Set(
             myMeetings
               .flatMap((meeting) => [meeting.member_1_id, meeting.member_2_id])
-              .filter(Boolean)
+              .filter((id): id is string => !!id)
           )
         );
 
@@ -67,11 +68,19 @@ export default function Activity() {
           new Set(
             myDeals
               .flatMap((deal) => [deal.from_member_id, deal.to_member_id, deal.creator_id])
-              .filter(Boolean)
+              .filter((id): id is string => !!id)
           )
         );
 
-        const profileIdsToLoad = Array.from(new Set([...meetingMemberIds, ...dealMemberIds]));
+        const linkUserIds = Array.from(
+          new Set(
+            myLinks
+              .flatMap((link) => [link.from_user_id, link.to_user_id])
+              .filter((id): id is string => !!id)
+          )
+        );
+
+        const profileIdsToLoad = Array.from(new Set([...meetingMemberIds, ...dealMemberIds, ...linkUserIds]));
         if (profileIdsToLoad.length > 0) {
           const combinedNameMap: Record<string, string> = {};
 
@@ -90,7 +99,7 @@ export default function Activity() {
           }
 
           // Fallback to secure house-members RPC for IDs hidden by profile RLS.
-          const unresolvedIds = profileIdsToLoad.filter((id) => !combinedNameMap[id]);
+          const unresolvedIds = profileIdsToLoad.filter((id): id is string => !!id && !combinedNameMap[id]);
           if (unresolvedIds.length > 0) {
             const houses = await LinksService.getUserHouses().catch(() => []);
             for (const house of houses) {
@@ -256,9 +265,19 @@ export default function Activity() {
                         <Text style={styles.itemSubText}>{link.contact_name}</Text>
                         <Text style={styles.itemMeta}>{formatTimestamp(link.created_at)}</Text>
 
+                        {linkFilter === 'received' ? (
+                          <Text style={styles.detailLine}>
+                            From: {memberNames[link.from_user_id] || 'Unknown'}
+                          </Text>
+                        ) : (
+                          <Text style={styles.detailLine}>
+                            To: {memberNames[link.to_user_id] || 'Unknown'}
+                          </Text>
+                        )}
+
                         {expandedLinks[link.id] && (
                           <View style={styles.detailContent}>
-                            <Text style={styles.detailLine}>Status: {link.status}</Text>
+                            <Text style={styles.detailLine}>Status: {formatLabel(link.status)}</Text>
                             <Text style={styles.detailLine}>Urgency: {link.urgency}/10</Text>
                             <Text style={styles.detailLine}>Phone: {link.contact_phone}</Text>
                             <Text style={styles.detailLine}>
@@ -365,7 +384,7 @@ export default function Activity() {
 
                         {expandedMeetings[meeting.id] && (
                           <View style={styles.detailContent}>
-                            <Text style={styles.detailLine}>Status: {meeting.status}</Text>
+                            <Text style={styles.detailLine}>Status: {formatLabel(meeting.status)}</Text>
                             <Text style={styles.detailLine}>
                               Member 1: {getMemberName(meeting.member_1_id)}
                             </Text>
@@ -460,6 +479,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxl,
   },
   header: {
+    textAlign: 'center',
     fontFamily: 'Poppins-Bold',
     fontSize: 42,
     color: colors.text_primary,

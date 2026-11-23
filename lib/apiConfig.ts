@@ -53,6 +53,14 @@ export function getAnalyzeTextEndpoint(): string {
 }
 
 /**
+ * Get the summarize-text API endpoint (voice notes / meeting summaries)
+ */
+export function getSummarizeTextEndpoint(): string {
+  const baseUrl = getApiBaseUrl();
+  return `${baseUrl}/functions/v1/summarize-text`;
+}
+
+/**
  * Safe fetch wrapper with error handling
  */
 export async function fetchWithErrorHandling<T>(

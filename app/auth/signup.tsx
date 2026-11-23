@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
 
+import { keyboardDismissProps } from '@/hooks/useFormFields';
 export default function SignupScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -194,6 +195,7 @@ export default function SignupScreen() {
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={keyboardDismissProps.keyboardDismissMode}
           showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             <View style={styles.header}>

@@ -17,6 +17,7 @@ import { authService } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/constants/theme';
 
+import { keyboardDismissProps } from '@/hooks/useFormFields';
 export default function ProfileSetupScreen() {
   const router = useRouter();
   const { userId, profile, refreshProfile } = useAuth();
@@ -98,7 +99,8 @@ export default function ProfileSetupScreen() {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={keyboardDismissProps.keyboardDismissMode}>
           <View style={styles.content}>
             <View style={styles.header}>
               <View style={styles.iconContainer}>
@@ -113,7 +115,7 @@ export default function ProfileSetupScreen() {
                 <Text style={styles.label}>Full Name *</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="John Doe"
+                  placeholder="Ramesh Kumar"
                   placeholderTextColor={colors.text_muted}
                   value={fullName}
                   onChangeText={setFullName}

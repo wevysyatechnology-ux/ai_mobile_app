@@ -16,7 +16,9 @@ import {
   ScrollView,
   ActivityIndicator,
   Platform,
+  Linking,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
@@ -48,16 +50,19 @@ interface Notification {
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [unreadCount, setUnreadCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      fetchUnreadCount();
-      setupRealtimeSubscription();
-    }
+    if (!user) return;
+    fetchUnreadCount();
+    const unsubscribe = setupRealtimeSubscription();
+    return () => {
+      unsubscribe?.();
+    };
   }, [user]);
 
   const fetchUnreadCount = async () => {
@@ -137,7 +142,12 @@ export function NotificationBell() {
 
     const data = notification.data || {};
 
-    switch (notification.type) {
+    switch (notification.type as string) {
+      // ── New app version → store page ────────────────────────────────
+      case 'app_update':
+        if (data.storeUrl) Linking.openURL(data.storeUrl).catch(() => {});
+        break;
+
       // ── Event notifications → Event Detail (or list if no id) ────────
       case 'meeting_reminder':
       case 'attendance_marked':
@@ -190,6 +200,22 @@ export function NotificationBell() {
         router.push('/(tabs)/profile' as any);
         break;
 
+      // ── New message → straight to that chat thread ──────────────────
+      case 'new_message':
+        if (data.connectionId) {
+          router.push({ pathname: '/chat-detail', params: { connectionId: data.connectionId } } as any);
+        } else {
+          router.push('/connect-requests' as any);
+        }
+        break;
+
+      // ── Connect request/response → Connect Requests inbox ───────────
+      case 'connect_request':
+      case 'connect_accepted':
+      case 'connect_declined':
+        router.push('/connect-requests' as any);
+        break;
+
       default:
         console.log('No navigation defined for type:', notification.type);
         break;
@@ -223,7 +249,8 @@ export function NotificationBell() {
   const renderNotificationIcon = (type: string) => {
     const iconMap: Record<string, string> = {
       link_received: '🔗',
-      deal_recorded: '💰',
+      // Rupee sign instead of the money-bag emoji, which carries a dollar sign.
+      deal_recorded: '₹',
       meeting_reminder: '📅',
       attendance_marked: '✓',
       ai_match_suggestion: '🤝',
@@ -232,6 +259,10 @@ export function NotificationBell() {
       application_approved: '🎉',
       i2we_meeting_scheduled: '📅',
       i2we_meeting_recorded: '✅',
+      connect_request: '🤝',
+      connect_accepted: '✅',
+      connect_declined: '🔔',
+      new_message: '💬',
     };
     return iconMap[type] || '🔔';
   };
@@ -245,7 +276,7 @@ export function NotificationBell() {
         <Text style={styles.iconEmoji}>{renderNotificationIcon(item.type)}</Text>
       </View>
       <View style={styles.notificationContent}>
-        <Text style={styles.notificationTitle}>{item.title}</Text>
+        <Text style={styles.notificationTitle}>{item.title.replace('💰', '₹')}</Text>
         <Text style={styles.notificationBody} numberOfLines={2}>
           {item.body}
         </Text>
@@ -276,7 +307,7 @@ export function NotificationBell() {
         onRequestClose={() => setShowModal(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+          <View style={[styles.modalHeader, { paddingTop: insets.top + 16 }]}>
             <Text style={styles.modalTitle}>Notifications</Text>
             <View style={styles.headerActions}>
               {unreadCount > 0 && (
@@ -442,6 +473,9 @@ const styles = StyleSheet.create({
   },
   iconEmoji: {
     fontSize: 24,
+    // Text glyphs (the rupee sign, the tick) need an explicit colour on the dark icon circle.
+    color: '#FBBF24',
+    fontWeight: '700',
   },
   notificationContent: {
     flex: 1,

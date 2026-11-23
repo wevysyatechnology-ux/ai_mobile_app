@@ -16,7 +16,14 @@ export type NotificationType =
   | 'ai_inactive_reminder'
   // Onboarding
   | 'application_submitted'
-  | 'application_approved';
+  | 'application_approved'
+  // Connect & Chat
+  | 'connect_request'
+  | 'connect_accepted'
+  | 'connect_declined'
+  | 'new_message'
+  // Calls
+  | 'incoming_call';
 
 export interface BaseNotificationPayload {
   type: NotificationType;
@@ -127,6 +134,53 @@ export interface ApplicationApprovedPayload extends BaseNotificationPayload {
   };
 }
 
+// Connect & Chat Notifications
+export interface ConnectRequestPayload extends BaseNotificationPayload {
+  type: 'connect_request';
+  data: {
+    connectionId: string;
+    requesterName: string;
+    requesterId: string;
+  };
+}
+
+export interface ConnectAcceptedPayload extends BaseNotificationPayload {
+  type: 'connect_accepted';
+  data: {
+    connectionId: string;
+    accepterName: string;
+    accepterId: string;
+  };
+}
+
+export interface ConnectDeclinedPayload extends BaseNotificationPayload {
+  type: 'connect_declined';
+  data: {
+    connectionId: string;
+    declinerName: string;
+  };
+}
+
+export interface NewMessagePayload extends BaseNotificationPayload {
+  type: 'new_message';
+  data: {
+    connectionId: string;
+    senderName: string;
+    senderId: string;
+    preview: string;
+  };
+}
+
+export interface IncomingCallPayload extends BaseNotificationPayload {
+  type: 'incoming_call';
+  data: {
+    callId: string;
+    connectionId: string;
+    callerName: string;
+    callerId: string;
+  };
+}
+
 // Union type for all notification payloads
 export type NotificationPayload =
   | LinkReceivedPayload
@@ -137,7 +191,12 @@ export type NotificationPayload =
   | AIMatchSuggestionPayload
   | AIInactiveReminderPayload
   | ApplicationSubmittedPayload
-  | ApplicationApprovedPayload;
+  | ApplicationApprovedPayload
+  | ConnectRequestPayload
+  | ConnectAcceptedPayload
+  | ConnectDeclinedPayload
+  | NewMessagePayload
+  | IncomingCallPayload;
 
 // Database schema for notifications
 export interface NotificationRecord {
@@ -190,7 +249,7 @@ export const NotificationTemplates: Record<
     body: `You've received a verified business link from ${data.senderName} in ${data.houseName}.`,
   }),
   deal_recorded: (data) => ({
-    title: '💰 Deal Recorded',
+    title: '₹ Deal Recorded',
     body: `${data.memberName} has recorded a deal with you worth ${data.currency}${data.amount.toLocaleString()}.`,
   }),
   i2we_meeting_scheduled: (data) => ({
@@ -221,6 +280,26 @@ export const NotificationTemplates: Record<
     title: '🎉 Welcome to WeVysya',
     body: `Your membership has been approved. You are now part of ${data.houseName}.`,
   }),
+  connect_request: (data) => ({
+    title: '🤝 New Connect Request',
+    body: `${data.requesterName} wants to connect with you.`,
+  }),
+  connect_accepted: (data) => ({
+    title: '✅ Connection Accepted',
+    body: `${data.accepterName} accepted your connect request. Start chatting!`,
+  }),
+  connect_declined: (data) => ({
+    title: 'Connect Request Declined',
+    body: `${data.declinerName} declined your connect request.`,
+  }),
+  new_message: (data) => ({
+    title: `💬 New message from ${data.senderName}`,
+    body: data.preview,
+  }),
+  incoming_call: (data) => ({
+    title: '📞 Incoming call',
+    body: `${data.callerName} is calling you.`,
+  }),
 };
 
 // Navigation mapping for notifications
@@ -234,4 +313,12 @@ export const NotificationNavigationMap: Record<NotificationType, string> = {
   ai_inactive_reminder: '/(tabs)/index',
   application_submitted: '/(tabs)/profile',
   application_approved: '/(tabs)/profile',
+  connect_request: '/connect-requests',
+  connect_accepted: '/connect-requests',
+  connect_declined: '/connect-requests',
+  new_message: '/connect-requests',
+  // Bare fallback only — real navigation with callId/connectionId params
+  // happens in the handleNotificationTapped special case in
+  // services/notificationService.ts, same as new_message.
+  incoming_call: '/call',
 };

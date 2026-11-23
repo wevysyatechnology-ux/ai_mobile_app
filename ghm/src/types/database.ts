@@ -34,6 +34,7 @@ export interface UserProfile {
   attendance_status: AttendanceStatus;
   absence_count: number;
   is_suspended: boolean;
+  mobile_app_access: boolean;
   created_at: string;
 }
 

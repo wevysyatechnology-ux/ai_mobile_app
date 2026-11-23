@@ -5,7 +5,6 @@ import Animated, {
   useAnimatedStyle,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
   Easing,
 } from 'react-native-reanimated';
@@ -23,42 +22,20 @@ const SIZES = {
 };
 
 export default function FloatingLogo({ size = 'medium' }: FloatingLogoProps) {
-  const translateY = useSharedValue(0);
-  const scale = useSharedValue(1);
+  // The logo itself stays still on every tab; only the glow breathes slowly.
+  // (It used to bob and scale on a loop, which made each page feel restless.)
   const glowOpacity = useSharedValue(0.4);
 
   useEffect(() => {
-    translateY.value = withRepeat(
-      withSequence(
-        withTiming(-8, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-      ),
-      -1,
-      false
-    );
-
-    scale.value = withRepeat(
-      withSequence(
-        withSpring(1.05, { damping: 10, stiffness: 50 }),
-        withSpring(1, { damping: 10, stiffness: 50 })
-      ),
-      -1,
-      false
-    );
-
     glowOpacity.value = withRepeat(
       withSequence(
-        withTiming(0.7, { duration: 2000 }),
-        withTiming(0.3, { duration: 2000 })
+        withTiming(0.6, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0.3, { duration: 3000, easing: Easing.inOut(Easing.ease) })
       ),
       -1,
       false
     );
   }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }, { scale: scale.value }],
-  }));
 
   const glowStyle = useAnimatedStyle(() => ({
     opacity: glowOpacity.value,
@@ -67,7 +44,7 @@ export default function FloatingLogo({ size = 'medium' }: FloatingLogoProps) {
   const dimensions = SIZES[size];
 
   return (
-    <Animated.View style={[styles.container, animatedStyle]}>
+    <Animated.View style={styles.container}>
       <Animated.View style={[styles.glowContainer, glowStyle]}>
         <LinearGradient
           colors={[

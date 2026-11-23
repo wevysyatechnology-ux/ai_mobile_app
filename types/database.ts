@@ -17,12 +17,17 @@ export interface UserProfile {
   house_id?: string | null;
   zone?: string | null;
   business?: string | null;
+  industry?: string | null;
   house?: CoreHouse | null;
   attendance_status: AttendanceStatus;
   absence_count: number;
   is_suspended: boolean;
   membership_status?: string | null;
+  membership_code?: string | null;
+  /** Date of joining (YYYY-MM-DD), from the official members sheet. */
+  member_since?: string | null;
   profile_photo?: string | null;
+  ai_consent?: 'accepted' | 'declined' | null;
   created_at: string;
 }
 
@@ -109,6 +114,68 @@ export interface CoreI2WE {
   meeting_date: string;
   notes: string | null;
   status: 'scheduled' | 'completed' | 'cancelled';
+  created_at: string;
+}
+
+export type ConnectionStatus = 'pending' | 'accepted' | 'declined';
+
+export interface CoreConnection {
+  id: string;
+  requester_id: string;
+  recipient_id: string;
+  status: ConnectionStatus;
+  requester_contact_consent: boolean;
+  recipient_contact_consent: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  connection_id: string;
+  sender_id: string;
+  body: string;
+  created_at: string;
+  read_at: string | null;
+}
+
+export type CallSessionStatus = 'ringing' | 'active' | 'declined' | 'missed' | 'ended';
+
+export interface CallSession {
+  id: string;
+  connection_id: string;
+  caller_id: string;
+  callee_id: string;
+  status: CallSessionStatus;
+  offer_sdp: RTCSessionDescriptionInitLike | null;
+  answer_sdp: RTCSessionDescriptionInitLike | null;
+  started_at: string | null;
+  ended_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Plain-object shape of an RTCSessionDescription, as stored in JSONB (avoids
+ *  depending on react-native-webrtc's own types from this shared types file). */
+export interface RTCSessionDescriptionInitLike {
+  type: 'offer' | 'answer' | 'pranswer' | 'rollback';
+  sdp: string;
+}
+
+export interface CallIceCandidate {
+  id: string;
+  call_id: string;
+  sender_id: string;
+  candidate: Record<string, any>;
+  created_at: string;
+}
+
+/** One speaker's transcribed segment of a call — see callTranscriptService.ts. */
+export interface CallTranscript {
+  id: string;
+  call_id: string;
+  speaker_id: string;
+  text: string;
   created_at: string;
 }
 

@@ -31,6 +31,9 @@ yarn-error.*
 .env*.local
 .env
 
+# secrets / service account keys
+service-account-file.json
+
 # typescript
 *.tsbuildinfo
 # supabase

@@ -6,7 +6,7 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import {
@@ -192,11 +192,15 @@ class NotificationService {
     // Update badge count
     this.updateBadgeCount();
 
-    // Store notification in local state/database
-    const payload = notification.request.content.data as unknown as NotificationPayload;
-    if (payload && payload.type) {
-      this.saveNotificationLocally(payload);
-    }
+    // NOTE: previously also called saveNotificationLocally(payload) here to
+    // insert a row into `notifications` client-side. Removed — it was
+    // redundant (supabase/functions/send-notification/index.ts already
+    // inserts the authoritative row server-side before the push is even
+    // sent) and actively broken: `payload` is the flat push data shape
+    // ({type, ...data}), not the nested {type, title, body, data} shape
+    // NotificationPayload models, so this was inserting a second, garbage
+    // row per push with title/body undefined and data: {} — which is what
+    // was actually showing up (and failing to navigate) in the bell list.
   }
 
   /**
@@ -210,15 +214,41 @@ class NotificationService {
 
     if (!payload || !payload.type) return;
 
+    // "New version available" announcement: open the store page.
+    if ((payload.type as string) === 'app_update') {
+      const storeUrl = (payload as any)?.storeUrl;
+      if (storeUrl) Linking.openURL(storeUrl).catch(() => {});
+      return;
+    }
+
     // Navigate to appropriate screen
     const screen = NotificationNavigationMap[payload.type];
     if (screen) {
       console.log('🚀 Navigate to:', screen);
       // Build params for event-related notifications so the screen can
       // highlight the specific event if an eventId is provided.
-      const eventId = (payload.data as any)?.eventId;
+      //
+      // NOTE: `payload` here IS the flat data object the push arrived with —
+      // supabase/functions/send-notification/index.ts builds the Expo
+      // message's `data` field as `{ type, ...payload.data }`, so fields
+      // like eventId/connectionId sit directly on `payload`, not nested
+      // under a `payload.data`. (The NotificationPayload TS type models a
+      // nested `.data`, which matches the DB row shape used elsewhere, but
+      // not this flattened push-delivery shape — reading `payload.data?.x`
+      // here silently returns undefined.)
+      const eventId = (payload as any)?.eventId;
+      // A new-message tap should land directly in that chat thread rather
+      // than the generic connect-requests inbox — the nav map only stores a
+      // bare route string with no param support, so this needs the same
+      // kind of special case as the event-meetings branch above.
+      const connectionId = (payload as any)?.connectionId;
+      const callId = (payload as any)?.callId;
       if (screen === '/event-meetings' && eventId) {
         router.push({ pathname: '/event-detail', params: { eventId } } as any);
+      } else if (payload.type === 'new_message' && connectionId) {
+        router.push({ pathname: '/chat-detail', params: { connectionId } } as any);
+      } else if (payload.type === 'incoming_call' && callId && connectionId) {
+        router.push({ pathname: '/call', params: { callId, connectionId, role: 'callee' } } as any);
       } else {
         router.push(screen as any);
       }

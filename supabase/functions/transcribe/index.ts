@@ -1,20 +1,26 @@
-// Supabase Edge Function for secure Deepgram transcription
-// Deploy with: supabase functions deploy transcribe
-// Environment variables needed: DEEPGRAM_API_KEY
+// Supabase Edge Function for secure OpenAI Whisper transcription
+// Deploy with: supabase functions deploy transcribe --no-verify-jwt
+// Environment variables needed: OPENAI_API_KEY
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
-const deepgramApiKey = Deno.env.get('DEEPGRAM_API_KEY');
-
-if (!deepgramApiKey) {
-  throw new Error('Missing DEEPGRAM_API_KEY environment variable');
-}
+const openAiApiKey = Deno.env.get('OPENAI_API_KEY');
 
 // CORS headers for browser clients
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Map our language codes to BCP-47 codes that Whisper understands
+const languageMap: Record<string, string> = {
+  en: 'en',
+  hi: 'hi',
+  ta: 'ta',
+  te: 'te',
+  kn: 'kn',
+  ml: 'ml',
 };
 
 serve(async (req: Request) => {
@@ -38,6 +44,10 @@ serve(async (req: Request) => {
   }
 
   try {
+    if (!openAiApiKey) {
+      throw new Error('Missing OPENAI_API_KEY environment variable');
+    }
+
     // Get multipart form data
     const formData = await req.formData();
     const audioFile = formData.get('file');
@@ -53,7 +63,7 @@ serve(async (req: Request) => {
       );
     }
 
-    // Validate language (basic validation)
+    // Validate language
     if (language.length > 10) {
       return new Response(
         JSON.stringify({ error: 'Invalid language parameter' }),
@@ -64,58 +74,40 @@ serve(async (req: Request) => {
       );
     }
 
-    // Deepgram API specific parameters
-    const url = new URL('https://api.deepgram.com/v1/listen');
-    url.searchParams.append('model', 'nova-2');
-    url.searchParams.append('smart_format', 'true');
-    // Deepgram currently prefers standard language codes (e.g. 'en', 'hi', etc.)
-    url.searchParams.append('language', language);
+    // Build OpenAI Whisper request
+    const whisperForm = new FormData();
+    whisperForm.append('file', audioFile as Blob, 'audio.m4a');
+    whisperForm.append('model', 'whisper-1');
 
-    // Call Deepgram API
-    // We can send the raw file directly in the body
-    const deepgramResponse = await fetch(url.toString(), {
+    // Pass language hint to Whisper (improves accuracy and speed)
+    const whisperLang = languageMap[language] || language;
+    whisperForm.append('language', whisperLang);
+
+    // Call OpenAI Whisper API
+    const openAiResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${deepgramApiKey}`,
-        'Content-Type': (audioFile as File).type || 'audio/m4a',
+        'Authorization': `Bearer ${openAiApiKey}`,
       },
-      body: audioFile,
+      body: whisperForm,
     });
 
-    if (!deepgramResponse.ok) {
-      let errorMessage = `Deepgram API error: ${deepgramResponse.status}`;
-
-      try {
-        const errorText = await deepgramResponse.text();
-        errorMessage = `Deepgram API error: ${deepgramResponse.status} - ${errorText}`;
-      } catch {
-        // Use default message
-      }
-
+    if (!openAiResponse.ok) {
+      const errorText = await openAiResponse.text();
       return new Response(
-        JSON.stringify({ error: errorMessage }),
+        JSON.stringify({ error: `OpenAI Whisper error: ${openAiResponse.status} - ${errorText}` }),
         {
-          status: deepgramResponse.status,
+          status: openAiResponse.status,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
         }
       );
     }
 
-    const data = await deepgramResponse.json();
+    const data = await openAiResponse.json();
 
-    // Extract transcript from Deepgram response
-    let transcript = '';
-    try {
-      transcript = data.results?.channels[0]?.alternatives[0]?.transcript || '';
-    } catch (e) {
-      console.error("Error parsing deepgram response:", e);
-    }
-
-    // Return transcription (same format as before for frontend compatibility)
+    // Return in same format as before for frontend compatibility
     return new Response(
-      JSON.stringify({
-        text: transcript,
-      }),
+      JSON.stringify({ text: data.text || '' }),
       {
         status: 200,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },

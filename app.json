@@ -2,7 +2,7 @@
   "expo": {
     "name": "WeVysya AI",
     "slug": "wevysya-app",
-    "version": "2.0.0",
+    "version": "2.5.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -20,7 +20,7 @@
       "androidCollapsedTitle": "WeVysya"
     },
     "android": {
-      "versionCode": 5,
+      "versionCode": 10,
       "package": "com.wevysya.app",
       "googleServicesFile": "./google-services.json",
       "splash": {
@@ -41,14 +41,21 @@
         "VIBRATE",
         "NOTIFICATIONS",
         "POST_NOTIFICATIONS",
-        "CAMERA"
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS"
       ]
     },
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "3",
+      "requireFullScreen": true,
+      "buildNumber": "16",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.wevysya.app",
       "infoPlist": {
+        "UIDeviceFamily": [
+          1
+        ],
         "UIBackgroundModes": [
           "remote-notification"
         ],
@@ -92,6 +99,14 @@
           "color": "#FF6B35",
           "defaultChannel": "default",
           "sounds": []
+        }
+      ],
+      [
+        "@daily-co/config-plugin-rn-daily-js",
+        {
+          "enableCamera": false,
+          "enableMicrophone": true,
+          "enableScreenShare": false
         }
       ]
     ],

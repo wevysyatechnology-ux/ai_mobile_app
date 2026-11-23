@@ -1,14 +1,10 @@
-// Supabase Edge Function for secure Deepgram Text-to-Speech (Aura)
-// Deploy with: supabase functions deploy speak
-// Environment variables needed: DEEPGRAM_API_KEY
+// Supabase Edge Function for secure OpenAI Text-to-Speech
+// Deploy with: supabase functions deploy speak --no-verify-jwt
+// Environment variables needed: OPENAI_API_KEY
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
-const deepgramApiKey = Deno.env.get('DEEPGRAM_API_KEY');
-
-if (!deepgramApiKey) {
-  throw new Error('Missing DEEPGRAM_API_KEY environment variable');
-}
+const openAiApiKey = Deno.env.get('OPENAI_API_KEY');
 
 // CORS headers for browser clients
 const corsHeaders = {
@@ -38,7 +34,11 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { text, model = 'aura-asteria-en' } = await req.json();
+    if (!openAiApiKey) {
+      throw new Error('Missing OPENAI_API_KEY environment variable');
+    }
+
+    const { text, voice = 'nova', model = 'tts-1' } = await req.json();
 
     if (!text || typeof text !== 'string') {
       return new Response(
@@ -50,40 +50,41 @@ serve(async (req: Request) => {
       );
     }
 
-    // Call Deepgram Aura Text-to-Speech API
-    const deepgramResponse = await fetch(`https://api.deepgram.com/v1/speak?model=${model}`, {
+    // Call OpenAI Text-to-Speech API
+    // voice options: alloy, echo, fable, onyx, nova, shimmer
+    // model: gpt-4o-mini-tts — best multilingual quality (Hindi + South Indian)
+    const openAiResponse = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${deepgramApiKey}`,
+        'Authorization': `Bearer ${openAiApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({
+        model,
+        voice,
+        input: text,
+        response_format: 'mp3',
+      }),
     });
 
-    if (!deepgramResponse.ok) {
-      const errorText = await deepgramResponse.text();
-      let errorMessage = `Deepgram TTS API error: ${deepgramResponse.status} - ${errorText}`;
-
+    if (!openAiResponse.ok) {
+      const errorText = await openAiResponse.text();
       return new Response(
-        JSON.stringify({ error: errorMessage }),
+        JSON.stringify({ error: `OpenAI TTS error: ${openAiResponse.status} - ${errorText}` }),
         {
-          status: deepgramResponse.status,
+          status: openAiResponse.status,
           headers: { 'Content-Type': 'application/json', ...corsHeaders },
         }
       );
     }
 
-    // Stream the audio back to the client immediately for lowest latency
-    // By passing deepgramResponse.body directly to the Response constructor, 
-    // we stream the data chunks to the mobile app as they arrive from Deepgram
-    return new Response(deepgramResponse.body, {
+    // Stream the audio back to the client
+    return new Response(openAiResponse.body, {
       status: 200,
       headers: {
         ...corsHeaders,
         'Content-Type': 'audio/mpeg',
-        'Content-Disposition': 'inline; filename="response.mp3"',
-        // Optional: add cache-control if needed
-        'Cache-Control': 'no-store, max-age=0'
+        'Cache-Control': 'no-store, max-age=0',
       },
     });
   } catch (error) {

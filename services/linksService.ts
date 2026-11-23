@@ -36,10 +36,34 @@ export const LinksService = {
         return [];
       }
 
-      // Filter out current user
-      const otherMembers = profilesData.filter((p: any) => p.id !== currentUserId);
+      // The RPC doesn't return membership_status/is_suspended, so fetch them separately.
+      const memberIds = profilesData
+        .filter((p: any) => p.id !== currentUserId)
+        .map((p: any) => p.id as string);
 
-      console.log('Members after filtering current user:', otherMembers.length);
+      const blockedStatuses = ['expired', 'suspended', 'resigned', 'terminated', 'inactive'];
+
+      let blockedIds = new Set<string>();
+      if (memberIds.length > 0) {
+        const { data: statusData } = await supabase
+          .from('users_profile')
+          .select('id, membership_status, is_suspended')
+          .in('id', memberIds);
+
+        for (const s of statusData || []) {
+          const status = (s.membership_status || '').toString().toLowerCase();
+          if (blockedStatuses.includes(status) || s.is_suspended === true) {
+            blockedIds.add(s.id);
+          }
+        }
+      }
+
+      // Filter out current user and blocked (inactive/suspended) members
+      const otherMembers = profilesData.filter(
+        (p: any) => p.id !== currentUserId && !blockedIds.has(p.id)
+      );
+
+      console.log('Members after filtering current user and inactive:', otherMembers.length);
 
       // Sort by full_name
       const sortedProfiles = otherMembers.sort((a: any, b: any) =>
@@ -122,7 +146,19 @@ export const LinksService = {
       throw profileError;
     }
 
-    if (!profileData || !profileData.house_id) {
+    // Some members' profiles carry an id that is not their login id (bulk-import e-mail typos), so the
+    // lookup above finds nothing. Fall back to matching by login e-mail on the server.
+    let houseId: string | null = profileData?.house_id ?? null;
+    if (!houseId) {
+      const { data: fallbackHouseId, error: fallbackError } = await supabase.rpc('get_my_house_id_by_login');
+      if (fallbackError) {
+        console.warn('get_my_house_id_by_login failed:', fallbackError.message);
+      } else if (fallbackHouseId) {
+        houseId = fallbackHouseId as string;
+      }
+    }
+
+    if (!houseId) {
       return [];
     }
 
@@ -130,7 +166,7 @@ export const LinksService = {
     const { data: houseData, error: houseError } = await supabase
       .from('houses')
       .select('id, name, state, zone')
-      .eq('id', profileData.house_id)
+      .eq('id', houseId)
       .maybeSingle();
 
     if (houseError) {

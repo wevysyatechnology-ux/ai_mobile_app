@@ -19,6 +19,23 @@ export interface KnowledgeDocument {
  */
 class KnowledgeService {
   private knowledgeCache: Map<string, KnowledgeDocument[]> = new Map();
+  // Tracks which named document sets have been loaded this session, so
+  // independent seed scripts (app FAQ, business advisor, etc.) can each
+  // load once without stepping on each other.
+  private _loadedKnowledgeSets = new Set<string>();
+  // Sources that are personal to the current user and must be scoped by user_id
+  // rather than stored as shared/global knowledge (user_id IS NULL).
+  private readonly PERSONAL_SOURCES = new Set(['user_activity', 'session_memory']);
+
+  /**
+   * Resolve the owning user_id for a document based on its source.
+   * Returns null for shared/global sources (core_knowledge, custom, etc).
+   */
+  private async resolveUserId(source: string): Promise<string | null> {
+    if (!this.PERSONAL_SOURCES.has(source)) return null;
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.id ?? null;
+  }
 
   /**
    * Initialize knowledge base in Supabase
@@ -46,6 +63,7 @@ class KnowledgeService {
     try {
       // Generate embedding for the document
       const embedding = await this.generateEmbedding(document.content);
+      const userId = await this.resolveUserId(document.metadata.source);
 
       // Store in Supabase
       const { error } = await supabase
@@ -54,6 +72,7 @@ class KnowledgeService {
           content: document.content,
           embedding: embedding,
           metadata: document.metadata,
+          user_id: userId,
         });
 
       if (error) {
@@ -73,21 +92,30 @@ class KnowledgeService {
 
   /**
    * Upsert document (insert or update if exists)
-   * Prevents duplicate entries by checking title and category
-   * @returns true if inserted, false if already existed
+   * Prevents duplicate entries by checking title and category.
+   * Documents with source 'user_activity' are always refreshed (updated) when they exist.
+   * @returns true if inserted/updated, false if skipped
    */
   async upsertDocument(document: Omit<KnowledgeDocument, 'id' | 'embedding'>): Promise<boolean> {
     try {
-      // Check if document already exists by title
-      const { data: existing } = await supabase
+      const userId = await this.resolveUserId(document.metadata.source);
+
+      // Check if document already exists by title + category, scoped to the
+      // owning user for personal docs so different users' rows never collide.
+      let existingQuery = supabase
         .from('knowledge_base')
         .select('id')
         .eq('metadata->>title', document.metadata.title)
-        .eq('metadata->>category', document.metadata.category)
-        .limit(1);
+        .eq('metadata->>category', document.metadata.category);
+      existingQuery = userId ? existingQuery.eq('user_id', userId) : existingQuery.is('user_id', null);
+      const { data: existing } = await existingQuery.limit(1);
 
-      // If exists, skip insertion
       if (existing && existing.length > 0) {
+        // User-activity docs should always be refreshed so the AI stays up-to-date
+        if (document.metadata.source === 'user_activity') {
+          await this.updateDocument(document);
+          return true;
+        }
         console.log('⏭️ Document already exists (skipping):', document.metadata.title);
         return false;
       }
@@ -98,6 +126,67 @@ class KnowledgeService {
     } catch (error) {
       console.error('❌ Error upserting document:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Update an existing knowledge document (replace content + re-embed).
+   * Used for user_activity documents that change over time.
+   */
+  async updateDocument(document: Omit<KnowledgeDocument, 'id' | 'embedding'>): Promise<void> {
+    try {
+      const embedding = await this.generateEmbedding(document.content);
+      const userId = await this.resolveUserId(document.metadata.source);
+
+      let updateQuery = supabase
+        .from('knowledge_base')
+        .update({
+          content: document.content,
+          embedding,
+          metadata: document.metadata,
+          user_id: userId,
+        })
+        .eq('metadata->>title', document.metadata.title)
+        .eq('metadata->>category', document.metadata.category);
+      updateQuery = userId ? updateQuery.eq('user_id', userId) : updateQuery.is('user_id', null);
+
+      const { error } = await updateQuery;
+
+      if (error) {
+        console.error('❌ Failed to update document:', error);
+        throw error;
+      }
+
+      console.log('🔄 Document updated:', document.metadata.title);
+      this.knowledgeCache.clear();
+    } catch (error) {
+      console.error('❌ Error updating document:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch a personal document's content for the current user, bypassing keyword/embedding
+   * matching. Used for lightweight cross-session memory that must load deterministically
+   * (e.g. at the start of a new session) rather than depend on the query matching it.
+   */
+  async getPersonalDocument(title: string, category: string): Promise<string | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('knowledge_base')
+        .select('content')
+        .eq('metadata->>title', title)
+        .eq('metadata->>category', category)
+        .eq('user_id', user.id)
+        .limit(1);
+
+      return data && data.length > 0 ? data[0].content : null;
+    } catch (error) {
+      console.error('❌ Error fetching personal document:', error);
+      return null;
     }
   }
 
@@ -236,31 +325,31 @@ class KnowledgeService {
   }
 
   /**
-   * Batch load knowledge documents
-   * Prevents duplicates by checking existing documents
+   * Batch load knowledge documents.
+   * Skips entirely if already loaded this session.
+   * Runs all upserts in parallel to avoid ANR from sequential network calls.
    */
-  async loadKnowledgeBase(documents: Array<Omit<KnowledgeDocument, 'id' | 'embedding'>>): Promise<void> {
-    console.log(`📚 Loading ${documents.length} documents...`);
-    
-    let loaded = 0;
-    let skipped = 0;
-    
-    for (const doc of documents) {
-      try {
-        // Use upsert to prevent duplicates
-        const inserted = await this.upsertDocument(doc);
-        if (inserted) {
-          loaded++;
-        } else {
-          skipped++;
-        }
-      } catch (error) {
-        console.error(`❌ Failed to load: ${doc.metadata.title}`, error);
-        skipped++;
-      }
+  async loadKnowledgeBase(
+    documents: Array<Omit<KnowledgeDocument, 'id' | 'embedding'>>,
+    setId: string = 'default'
+  ): Promise<void> {
+    if (this._loadedKnowledgeSets.has(setId)) {
+      console.log(`⏭️ Knowledge set '${setId}' already loaded this session, skipping.`);
+      return;
     }
-    
-    console.log(`✅ Knowledge base loaded: ${loaded} added, ${skipped} skipped/failed`);
+
+    console.log(`📚 Loading ${documents.length} documents in parallel...`);
+
+    const results = await Promise.allSettled(
+      documents.map(doc => this.upsertDocument(doc))
+    );
+
+    const loaded = results.filter(r => r.status === 'fulfilled' && r.value).length;
+    const skipped = results.filter(r => r.status === 'fulfilled' && !r.value).length;
+    const failed = results.filter(r => r.status === 'rejected').length;
+
+    this._loadedKnowledgeSets.add(setId);
+    console.log(`✅ Knowledge set '${setId}' loaded: ${loaded} added, ${skipped} skipped, ${failed} failed`);
   }
 
   /**

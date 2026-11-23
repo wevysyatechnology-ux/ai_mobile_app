@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Sparkles } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
@@ -9,18 +9,33 @@ interface SmartPromptChipsProps {
   onPromptPress: (prompt: string) => void;
 }
 
-const PROMPTS = [
+interface Prompt {
+  text: string;
+  icon: boolean;
+  route?: string;
+  comingSoon?: boolean;
+}
+
+const PROMPTS: Prompt[] = [
   { text: 'Find a CA in Bengaluru', icon: true, route: '/(tabs)/discover' },
   { text: 'Post a deal', icon: true, route: '/deals-form' },
-  { text: 'Invite a visitor', icon: true, route: '/i2we-form' },
-  { text: 'Call a member', icon: true, route: '/call' },
+  // No visitor flow exists yet (the Visitors channel is also "Coming Soon"),
+  // and '/i2we-form' is a different feature — don't route there.
+  { text: 'Invite a visitor', icon: true, comingSoon: true },
+  // '/call' now requires connectionId/callId/role params (real WebRTC call
+  // screen, no longer a demo) — route here to the inbox where the user picks
+  // an actual accepted connection to call, instead of a bare unparameterized
+  // push that would blank-render.
+  { text: 'Call a member', icon: true, route: '/connect-requests' },
 ];
 
 export default function SmartPromptChips({
   onPromptPress,
 }: SmartPromptChipsProps) {
-  const handlePress = (prompt: typeof PROMPTS[0]) => {
-    if (prompt.route) {
+  const handlePress = (prompt: Prompt) => {
+    if (prompt.comingSoon) {
+      Alert.alert('Coming Soon', 'Inviting visitors will be available in a future update.');
+    } else if (prompt.route) {
       router.push(prompt.route as any);
     } else {
       onPromptPress(prompt.text);

@@ -12,7 +12,8 @@ import {
   Pressable,
 } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { ChevronLeft, Plus } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
+import AddButton from '@/components/shared/AddButton';
 import { channelsService } from '@/services/channelsService';
 import { DealsService } from '@/services/dealsService';
 import { I2WEService } from '@/services/i2weService';
@@ -24,6 +25,8 @@ import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { format, isToday, isTomorrow } from 'date-fns';
 
+import { keyboardDismissProps } from '@/hooks/useFormFields';
+import { formatLabel } from '@/utils/formatLabel';
 export default function ChannelDetailScreen() {
   const { channelId, channelSlug } = useLocalSearchParams();
   const { user } = useAuth();
@@ -41,6 +44,8 @@ export default function ChannelDetailScreen() {
   const [creating, setCreating] = useState(false);
   const [linksFilter, setLinksFilter] = useState<'all' | 'received' | 'given'>('all');
   const [selectedLink, setSelectedLink] = useState<CoreLink | null>(null);
+  const [selectedDeal, setSelectedDeal] = useState<CoreDeal | null>(null);
+  const [memberNames, setMemberNames] = useState<Record<string, string>>({});
 
   const filteredLinks = useMemo(() => {
     if (!user?.id) return links;
@@ -77,6 +82,64 @@ export default function ChannelDetailScreen() {
     return 'posts';
   };
 
+  // Resolves from_user_id/to_user_id on links to display names ("From"/"To") in
+  // the list and detail modal. Mirrors app/(tabs)/activity.tsx's memberNames
+  // resolution: direct profiles lookup first, then a fallback through the secure
+  // get_house_members RPC for ids hidden by profile RLS.
+  const loadMemberNamesFor = async (rawIds: (string | null | undefined)[]) => {
+    const ids = Array.from(new Set(rawIds.filter((id): id is string => !!id)));
+    if (ids.length === 0) return;
+
+    const combinedNameMap: Record<string, string> = {};
+
+    // get_member_names returns just id + full_name for ANY member (including other houses), which
+    // profile RLS would otherwise hide as "Unknown".
+    const { data: nameRows, error: nameError } = await supabase.rpc('get_member_names', { p_ids: ids });
+    if (!nameError && nameRows) {
+      for (const row of nameRows as { id: string; full_name: string }[]) {
+        if (row.id && row.full_name) combinedNameMap[row.id] = row.full_name.trim();
+      }
+    }
+
+    // Fallbacks (used until the RPC exists): the profile row itself, then the members of the user's houses.
+    const stillMissing = ids.filter((id) => !combinedNameMap[id]);
+    if (stillMissing.length > 0) {
+      const { data: profileRows, error } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', stillMissing);
+      if (!error && profileRows) {
+        for (const row of profileRows) {
+          if (row.id && row.full_name) combinedNameMap[row.id] = row.full_name;
+        }
+      }
+    }
+
+    const unresolvedIds = ids.filter((id) => !combinedNameMap[id]);
+    if (unresolvedIds.length > 0) {
+      const houses = await LinksService.getUserHouses().catch(() => []);
+      for (const house of houses) {
+        const members = await LinksService.getHouseMembers(house.id).catch(() => []);
+        for (const member of members) {
+          if (member.id && member.full_name) combinedNameMap[member.id] = member.full_name;
+        }
+      }
+    }
+
+    setMemberNames((previous) => ({ ...previous, ...combinedNameMap }));
+  };
+
+  // Who gave the deal: the member it came from, WeVysya, or "Self" when the member sourced it.
+  const dealSourceName = (deal: CoreDeal) => {
+    if (deal.deal_type === 'wevysya_deal' && !deal.from_member_id) return 'WeVysya';
+    if (!deal.from_member_id) return 'Not recorded';
+    if (deal.from_member_id === user?.id) return 'Self';
+    return memberNames[deal.from_member_id] || 'Unknown';
+  };
+
+  const loadLinkMemberNames = (linksData: CoreLink[]) =>
+    loadMemberNamesFor(linksData.flatMap((link) => [link.from_user_id, link.to_user_id]));
+
   const loadStructuredChannelData = async (slug: string) => {
     const channelType = getChannelType(slug);
 
@@ -86,6 +149,7 @@ export default function ChannelDetailScreen() {
       setDeals([]);
       setMeetings([]);
       setPosts([]);
+      await loadLinkMemberNames(linksData);
       return;
     }
 
@@ -95,6 +159,7 @@ export default function ChannelDetailScreen() {
       setLinks([]);
       setMeetings([]);
       setPosts([]);
+      await loadMemberNamesFor(dealsData.flatMap((deal) => [deal.from_member_id, deal.creator_id]));
       return;
     }
 
@@ -269,20 +334,15 @@ export default function ChannelDetailScreen() {
           <ChevronLeft size={24} color={COLORS.text} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Text style={styles.headerIcon}>{channel.icon}</Text>
           <Text style={styles.headerTitle}>{channel.name}</Text>
         </View>
-        <TouchableOpacity
-          onPress={handleHeaderAction}
-          style={styles.iconButton}
-        >
-          <Plus size={24} color={COLORS.primary} />
-        </TouchableOpacity>
+        <AddButton onPress={handleHeaderAction} accessibilityLabel={`New ${channel.name}`} />
       </View>
 
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
+        {...keyboardDismissProps}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.descriptionCard}>
@@ -397,7 +457,12 @@ export default function ChannelDetailScreen() {
                       </View>
                     </View>
                     <Text style={styles.postContent}>Contact: {link.contact_name}</Text>
-                    <Text style={styles.postContent}>Status: {link.status}</Text>
+                    <Text style={styles.postContent}>
+                      {link.to_user_id === user?.id
+                        ? `From: ${memberNames[link.from_user_id] || 'Unknown'}`
+                        : `To: ${memberNames[link.to_user_id] || 'Unknown'}`}
+                    </Text>
+                    <Text style={styles.postContent}>Status: {formatLabel(link.status)}</Text>
                     <Text style={styles.postDate}>
                       {new Date(link.created_at).toLocaleDateString()}
                     </Text>
@@ -417,13 +482,18 @@ export default function ChannelDetailScreen() {
                 </View>
               ) : (
                 deals.map((deal) => (
-                  <View key={deal.id} style={styles.postCard}>
+                  <TouchableOpacity
+                    key={deal.id}
+                    style={styles.postCard}
+                    activeOpacity={0.8}
+                    onPress={() => setSelectedDeal(deal)}>
                     <Text style={styles.postTitle}>{deal.title}</Text>
                     <Text style={styles.postContent}>Amount: ₹{deal.amount}</Text>
+                    <Text style={styles.postContent}>Received from: {dealSourceName(deal)}</Text>
                     <Text style={styles.postDate}>
                       {new Date(deal.created_at).toLocaleDateString()}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 ))
               )}
             </>
@@ -441,7 +511,7 @@ export default function ChannelDetailScreen() {
                 meetings.map((meeting) => (
                   <View key={meeting.id} style={styles.postCard}>
                     <Text style={styles.postTitle}>I2WE Meeting</Text>
-                    <Text style={styles.postContent}>Status: {meeting.status}</Text>
+                    <Text style={styles.postContent}>Status: {formatLabel(meeting.status)}</Text>
                     <Text style={styles.postContent}>
                       Date: {new Date(meeting.meeting_date).toLocaleDateString()}
                     </Text>
@@ -614,6 +684,71 @@ export default function ChannelDetailScreen() {
         </View>
       </ScrollView>
 
+      {/* Deal Detail Modal */}
+      <Modal
+        visible={!!selectedDeal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedDeal(null)}>
+        <Pressable style={styles.modalOverlay} onPress={() => setSelectedDeal(null)}>
+          <Pressable style={styles.modalSheet} onPress={() => {}}>
+            {selectedDeal && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedDeal.title}</Text>
+                </View>
+
+                <View style={styles.modalDivider} />
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Amount</Text>
+                  <Text style={styles.modalValue}>₹{Number(selectedDeal.amount).toLocaleString('en-IN')}</Text>
+                </View>
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Received from</Text>
+                  <Text style={styles.modalValue}>{dealSourceName(selectedDeal)}</Text>
+                </View>
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Recorded by</Text>
+                  <Text style={styles.modalValue}>
+                    {selectedDeal.creator_id === user?.id
+                      ? 'You'
+                      : memberNames[selectedDeal.creator_id] || 'Unknown'}
+                  </Text>
+                </View>
+
+                {selectedDeal.status ? (
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Status</Text>
+                    <Text style={styles.modalValue}>{formatLabel(selectedDeal.status)}</Text>
+                  </View>
+                ) : null}
+
+                {selectedDeal.description ? (
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Description</Text>
+                    <Text style={styles.modalValue}>{selectedDeal.description}</Text>
+                  </View>
+                ) : null}
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Date</Text>
+                  <Text style={styles.modalValue}>
+                    {new Date(selectedDeal.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+
+                <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setSelectedDeal(null)}>
+                  <Text style={styles.modalCloseBtnText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
       {/* Link Detail Modal */}
       <Modal
         visible={!!selectedLink}
@@ -640,6 +775,19 @@ export default function ChannelDetailScreen() {
                   <Text style={styles.modalValue}>{selectedLink.contact_name}</Text>
                 </View>
 
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>
+                    {selectedLink.to_user_id === user?.id ? 'From' : 'To'}
+                  </Text>
+                  <Text style={styles.modalValue}>
+                    {memberNames[
+                      selectedLink.to_user_id === user?.id
+                        ? selectedLink.from_user_id
+                        : selectedLink.to_user_id
+                    ] || 'Unknown'}
+                  </Text>
+                </View>
+
                 {selectedLink.contact_phone ? (
                   <View style={styles.modalRow}>
                     <Text style={styles.modalLabel}>Phone</Text>
@@ -656,7 +804,7 @@ export default function ChannelDetailScreen() {
 
                 <View style={styles.modalRow}>
                   <Text style={styles.modalLabel}>Status</Text>
-                  <Text style={styles.modalValue}>{selectedLink.status}</Text>
+                  <Text style={styles.modalValue}>{formatLabel(selectedLink.status)}</Text>
                 </View>
 
                 <View style={styles.modalRow}>

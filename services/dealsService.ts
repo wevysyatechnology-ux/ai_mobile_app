@@ -98,25 +98,17 @@ export const DealsService = {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error('Not authenticated');
 
+    // Fetch deals where user is creator, receiver, or giver
     const { data, error } = await supabase
-      .from('deal_participants')
-      .select(`
-        deal_id,
-        core_deals (*)
-      `)
-      .eq('user_id', userData.user.id)
-      .order('created_at', { ascending: false, foreignTable: 'core_deals' });
+      .from('core_deals')
+      .select('*')
+      .or(
+        `creator_id.eq.${userData.user.id},to_member_id.eq.${userData.user.id},from_member_id.eq.${userData.user.id}`
+      )
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
-
-    // Keep latest entries first even if join ordering is inconsistent.
-    const deals = data?.map((item: any) => item.core_deals).filter(Boolean) || [];
-    deals.sort(
-      (a: CoreDeal, b: CoreDeal) =>
-        new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-    );
-
-    return deals;
+    return data || [];
   },
 
   async joinDeal(dealId: string): Promise<void> {

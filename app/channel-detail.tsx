@@ -41,6 +41,8 @@ export default function ChannelDetailScreen() {
   const [creating, setCreating] = useState(false);
   const [linksFilter, setLinksFilter] = useState<'all' | 'received' | 'given'>('all');
   const [selectedLink, setSelectedLink] = useState<CoreLink | null>(null);
+  const [dealsFilter, setDealsFilter] = useState<'all' | 'received' | 'given'>('all');
+  const [selectedDeal, setSelectedDeal] = useState<CoreDeal | null>(null);
 
   const filteredLinks = useMemo(() => {
     if (!user?.id) return links;
@@ -55,6 +57,20 @@ export default function ChannelDetailScreen() {
 
     return links;
   }, [links, linksFilter, user?.id]);
+
+  const filteredDeals = useMemo(() => {
+    if (!user?.id) return deals;
+
+    if (dealsFilter === 'received') {
+      return deals.filter((deal) => deal.to_member_id === user.id);
+    }
+
+    if (dealsFilter === 'given') {
+      return deals.filter((deal) => deal.from_member_id === user.id);
+    }
+
+    return deals;
+  }, [deals, dealsFilter, user?.id]);
 
   useEffect(() => {
     loadChannelData();
@@ -409,21 +425,75 @@ export default function ChannelDetailScreen() {
 
           {getChannelType(channel.slug) === 'deals' && (
             <>
-              <Text style={styles.sectionTitle}>Deals ({deals.length})</Text>
-              {deals.length === 0 ? (
+              <Text style={styles.sectionTitle}>Deals ({filteredDeals.length})</Text>
+
+              <View style={styles.filterRow}>
+                <TouchableOpacity
+                  style={[styles.filterChip, dealsFilter === 'all' && styles.filterChipActive]}
+                  onPress={() => setDealsFilter('all')}>
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      dealsFilter === 'all' && styles.filterChipTextActive,
+                    ]}>
+                    All
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.filterChip,
+                    dealsFilter === 'received' && styles.filterChipActive,
+                  ]}
+                  onPress={() => setDealsFilter('received')}>
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      dealsFilter === 'received' && styles.filterChipTextActive,
+                    ]}>
+                    Received
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.filterChip, dealsFilter === 'given' && styles.filterChipActive]}
+                  onPress={() => setDealsFilter('given')}>
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      dealsFilter === 'given' && styles.filterChipTextActive,
+                    ]}>
+                    Given
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {filteredDeals.length === 0 ? (
                 <View style={styles.emptyState}>
                   <Text style={styles.emptyStateText}>No deals yet</Text>
                   <Text style={styles.emptyStateSubtext}>Create a new deal using +</Text>
                 </View>
               ) : (
-                deals.map((deal) => (
-                  <View key={deal.id} style={styles.postCard}>
-                    <Text style={styles.postTitle}>{deal.title}</Text>
+                filteredDeals.map((deal) => (
+                  <TouchableOpacity
+                    key={deal.id}
+                    style={styles.postCard}
+                    onPress={() => setSelectedDeal(deal)}
+                    activeOpacity={0.75}>
+                    <View style={styles.linkHeaderRow}>
+                      <Text style={styles.postTitle}>{deal.title}</Text>
+                      <View style={styles.linkTag}>
+                        <Text style={styles.linkTagText}>
+                          {deal.to_member_id === user?.id ? 'Received' : 'Given'}
+                        </Text>
+                      </View>
+                    </View>
                     <Text style={styles.postContent}>Amount: ₹{deal.amount}</Text>
+                    {deal.status && (
+                      <Text style={styles.postContent}>Status: {deal.status}</Text>
+                    )}
                     <Text style={styles.postDate}>
                       {new Date(deal.created_at).toLocaleDateString()}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 ))
               )}
             </>
@@ -681,6 +751,76 @@ export default function ChannelDetailScreen() {
                 <TouchableOpacity
                   style={styles.modalCloseBtn}
                   onPress={() => setSelectedLink(null)}>
+                  <Text style={styles.modalCloseBtnText}>Close</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Deal Detail Modal */}
+      <Modal
+        visible={!!selectedDeal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedDeal(null)}>
+        <Pressable style={styles.modalOverlay} onPress={() => setSelectedDeal(null)}>
+          <Pressable style={styles.modalSheet} onPress={() => {}}>
+            {selectedDeal && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedDeal.title}</Text>
+                  <View style={styles.linkTag}>
+                    <Text style={styles.linkTagText}>
+                      {selectedDeal.to_member_id === user?.id ? 'Received' : 'Given'}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.modalDivider} />
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Amount</Text>
+                  <Text style={styles.modalValue}>₹{selectedDeal.amount}</Text>
+                </View>
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Status</Text>
+                  <Text style={styles.modalValue}>
+                    {selectedDeal.status
+                      ? selectedDeal.status.charAt(0).toUpperCase() +
+                        selectedDeal.status.slice(1).replace('_', ' ')
+                      : '—'}
+                  </Text>
+                </View>
+
+                {selectedDeal.deal_type ? (
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Deal Type</Text>
+                    <Text style={styles.modalValue}>
+                      {selectedDeal.deal_type === 'house_deal' ? 'House Deal' : 'WeVysya Deal'}
+                    </Text>
+                  </View>
+                ) : null}
+
+                {selectedDeal.description ? (
+                  <View style={styles.modalRow}>
+                    <Text style={styles.modalLabel}>Description</Text>
+                    <Text style={styles.modalValue}>{selectedDeal.description}</Text>
+                  </View>
+                ) : null}
+
+                <View style={styles.modalRow}>
+                  <Text style={styles.modalLabel}>Date</Text>
+                  <Text style={styles.modalValue}>
+                    {new Date(selectedDeal.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.modalCloseBtn}
+                  onPress={() => setSelectedDeal(null)}>
                   <Text style={styles.modalCloseBtnText}>Close</Text>
                 </TouchableOpacity>
               </>

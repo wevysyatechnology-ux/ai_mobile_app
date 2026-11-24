@@ -292,12 +292,7 @@ export default function LoginScreen() {
                 </TouchableOpacity>
 
                 <View style={styles.signupPrompt}>
-                  <Text style={styles.signupText}>Don't have an account?</Text>
-                  <TouchableOpacity
-                    onPress={() => router.push('/auth/signup')}
-                    disabled={isLoading}>
-                    <Text style={styles.signupLink}>Create Account</Text>
-                  </TouchableOpacity>
+                  <Text style={styles.signupText}>To join WeVysya, contact your house admin.</Text>
                 </View>
             </>
           </Animated.View>

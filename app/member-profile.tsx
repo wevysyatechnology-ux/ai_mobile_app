@@ -29,7 +29,7 @@ export default function MemberProfileScreen() {
   const name = params.name || 'Member';
   const category = params.category || 'Business';
   const location = params.location || 'Location not set';
-  const circle = params.circle || 'open';
+  const circle = params.circle || 'inner';
   const tier = params.tier || 'regular';
   const profilePhoto = params.profile_photo || '';
   const phoneNumber = params.phone_number?.trim() || '';

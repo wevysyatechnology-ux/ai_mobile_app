@@ -33,7 +33,7 @@ export default function Discover() {
           phone_number: member.phone_number,
           category: member.business_category || 'Business',
           location: [member.city, member.state].filter(Boolean).join(', ') || 'Location not set',
-          circle: member.vertical_type === 'inner_circle' ? 'inner' : 'open',
+          circle: member.vertical_type === 'open_circle' ? 'open' : 'inner',
           tier: 'regular',
           profile_photo: undefined,
           is_online: false,

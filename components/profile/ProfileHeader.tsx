@@ -4,6 +4,8 @@ import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
 import type { User } from '@/types';
 import ProfilePictureUploader from './ProfilePictureUploader';
 
+const PRIVILEGED_BADGE = require('@/assets/images/badges/privileged-member.png');
+
 interface ProfileHeaderProps {
   user: User;
   /** When provided the avatar becomes tappable for upload */
@@ -41,7 +43,12 @@ export default function ProfileHeader({ user, onPhotoUpdated }: ProfileHeaderPro
         {!onPhotoUpdated && user.is_online && <View style={styles.onlineIndicator} />}
       </View>
 
-      <Text style={styles.name}>{user.name}</Text>
+      <View style={styles.nameRow}>
+        <Text style={styles.name}>{user.name}</Text>
+        {user.tier === 'privileged' && (
+          <Image source={PRIVILEGED_BADGE} style={styles.nameBadgeIcon} />
+        )}
+      </View>
       <Text style={styles.category}>{user.category}</Text>
       <Text style={styles.location}>{user.location}</Text>
 
@@ -89,11 +96,22 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: colors.bg_primary,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: spacing.xs,
+  },
   name: {
     fontFamily: 'Poppins-Bold',
     fontSize: fontSize.xxl,
     color: colors.text_primary,
-    marginBottom: spacing.xs,
+    flexShrink: 1,
+  },
+  nameBadgeIcon: {
+    width: 22,
+    height: 22,
+    resizeMode: 'contain',
   },
   category: {
     fontFamily: 'Poppins-Medium',

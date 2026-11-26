@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
 import type { User } from '@/types';
 
+const PRIVILEGED_BADGE = require('@/assets/images/badges/privileged-member.png');
+
 interface MemberCardProps {
   member: User;
 }
@@ -72,9 +74,14 @@ export default function MemberCard({ member }: MemberCardProps) {
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
-          {member.name}
-        </Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.name} numberOfLines={1}>
+            {member.name}
+          </Text>
+          {member.tier === 'privileged' && (
+            <Image source={PRIVILEGED_BADGE} style={styles.badgeIcon} />
+          )}
+        </View>
         <Text style={styles.category} numberOfLines={1}>
           {member.category}
         </Text>
@@ -156,11 +163,22 @@ const styles = StyleSheet.create({
   info: {
     marginBottom: spacing.md,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: spacing.xs,
+  },
   name: {
     fontFamily: 'Poppins-Medium',
     fontSize: fontSize.lg,
     color: colors.text_primary,
-    marginBottom: spacing.xs,
+    flexShrink: 1,
+  },
+  badgeIcon: {
+    width: 18,
+    height: 18,
+    resizeMode: 'contain',
   },
   category: {
     fontFamily: 'Poppins-Regular',

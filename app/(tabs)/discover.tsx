@@ -7,6 +7,7 @@ import DiscoverSection from '@/components/discover/DiscoverSection';
 import FloatingLogo from '@/components/shared/FloatingLogo';
 import { useAuth } from '@/contexts/AuthContext';
 import { LinksService } from '@/services/linksService';
+import { supabase } from '@/lib/supabase';
 import type { User } from '@/types';
 
 export default function Discover() {
@@ -26,6 +27,23 @@ export default function Discover() {
         setMembersLoading(true);
         const members = await LinksService.getHouseMembers(profile.house_id);
 
+        // Query core_memberships to find privileged members
+        const memberIds = members.map((m) => m.id);
+        const privilegedIds = new Set<string>();
+
+        if (memberIds.length > 0) {
+          const { data: memberships } = await supabase
+            .from('core_memberships')
+            .select('user_id, membership_type')
+            .in('user_id', memberIds)
+            .eq('membership_type', 'privileged')
+            .eq('membership_status', 'active');
+
+          if (memberships) {
+            memberships.forEach((m: any) => privilegedIds.add(m.user_id));
+          }
+        }
+
         const mappedMembers: User[] = members.map((member) => ({
           id: member.id,
           name: member.full_name || 'Member',
@@ -34,7 +52,7 @@ export default function Discover() {
           category: member.business_category || 'Business',
           location: [member.city, member.state].filter(Boolean).join(', ') || 'Location not set',
           circle: member.vertical_type === 'inner_circle' ? 'inner' : 'open',
-          tier: 'regular',
+          tier: privilegedIds.has(member.id) ? 'privileged' : 'regular',
           profile_photo: undefined,
           is_online: false,
           created_at: member.created_at,

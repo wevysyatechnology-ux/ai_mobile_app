@@ -6,6 +6,8 @@ import { colors, spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 
+const PRIVILEGED_BADGE = require('@/assets/images/badges/privileged-member.png');
+
 interface HouseDetails {
   name: string;
   zone: string;
@@ -119,18 +121,30 @@ export default function MemberProfileScreen() {
             )}
           </View>
 
-          <Text style={styles.name}>{name}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{name}</Text>
+            {tier === 'privileged' && (
+              <Image source={PRIVILEGED_BADGE} style={styles.nameBadge} />
+            )}
+          </View>
           <Text style={styles.category}>{category}</Text>
           <Text style={styles.location}>{location}</Text>
+
+          {tier === 'privileged' && (
+            <View style={styles.privilegedPill}>
+              <Image source={PRIVILEGED_BADGE} style={styles.pillBadge} />
+              <Text style={styles.privilegedPillText}>Privileged</Text>
+            </View>
+          )}
 
           <View style={styles.metaRow}>
             <View style={styles.metaPill}>
               <Text style={styles.metaPillLabel}>Circle</Text>
               <Text style={styles.metaPillValue}>{circle}</Text>
             </View>
-            <View style={styles.metaPill}>
+            <View style={[styles.metaPill, tier === 'privileged' && styles.metaPillGold]}>
               <Text style={styles.metaPillLabel}>Tier</Text>
-              <Text style={styles.metaPillValue}>{tier}</Text>
+              <Text style={[styles.metaPillValue, tier === 'privileged' && styles.metaPillValueGold]}>{tier}</Text>
             </View>
           </View>
 
@@ -238,11 +252,45 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.bg_secondary,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: spacing.xs,
+  },
   name: {
     fontFamily: 'Poppins-Bold',
     fontSize: 28,
     color: colors.text_primary,
-    marginBottom: spacing.xs,
+    flexShrink: 1,
+  },
+  nameBadge: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  privilegedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginBottom: spacing.md,
+  },
+  pillBadge: {
+    width: 14,
+    height: 14,
+    resizeMode: 'contain',
+  },
+  privilegedPillText: {
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 13,
+    color: '#FFD700',
+    letterSpacing: 0.5,
   },
   category: {
     fontFamily: 'Poppins-Medium',
@@ -282,6 +330,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.text_primary,
     textTransform: 'capitalize',
+  },
+  metaPillGold: {
+    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+    borderColor: 'rgba(255, 215, 0, 0.25)',
+  },
+  metaPillValueGold: {
+    color: '#FFD700',
   },
   houseCard: {
     width: '100%',

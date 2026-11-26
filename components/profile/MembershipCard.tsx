@@ -53,7 +53,7 @@ export default function MembershipCard({ user }: MembershipCardProps) {
             <View style={[styles.divider, styles.dividerGold]} />
             <View style={styles.benefitsSection}>
               <Text style={styles.benefitsTitle}>Benefits</Text>
-              {['Priority event access', 'Exclusive networking', 'VIP business connections', 'Premium badge display'].map((benefit, index) => (
+              {['Priority event access', 'Exclusive networking', 'VIP business links', 'Premium badge display'].map((benefit, index) => (
                 <View key={index} style={styles.benefitRow}>
                   <Text style={styles.benefitDot}>•</Text>
                   <Text style={styles.benefitText}>{benefit}</Text>

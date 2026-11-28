@@ -64,7 +64,7 @@ class ActionEngine {
 
     // i2we actions
     this.actionMap.set('create_i2we', {
-      handler: this.createI2we,
+      handler: this.createI2We,
       screen: '/i2we-form',
       description: 'Create an i2we connection request',
     });
@@ -451,7 +451,7 @@ class ActionEngine {
     };
   }
 
-  private async createI2we(params: any): Promise<any> {
+  private async createI2We(params: any): Promise<any> {
     return {
       success: true,
       navigation: true,

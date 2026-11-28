@@ -98,7 +98,7 @@ project/
 - AI-powered conversational interface
 - Member discovery and networking
 - Channels for different verticals
-- Links, Deals, and I2WE meetings
+- Links, Deals, and i2We meetings
 - Attendance status display for Inner Circle members
 
 ### GHM Portal

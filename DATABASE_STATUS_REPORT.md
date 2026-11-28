@@ -35,7 +35,7 @@ The database connection is **fully operational** and secure.
 |-------|--------|--------|
 | `memberships` | ❌ Missing | May affect user-house relationships |
 | `channel_members` | ❌ Missing | May affect channel membership |
-| `i2we_submissions` | ❌ Missing | May affect I2We feature |
+| `i2we_submissions` | ❌ Missing | May affect i2We feature |
 
 **Note:** The app may reference different table names like `core_memberships` and `virtual_memberships` instead of just `memberships`.
 
@@ -51,7 +51,7 @@ The database connection is **fully operational** and secure.
 ### For Advanced Features: ⚠️ NEEDS VERIFICATION
 - House memberships (depends on `memberships` table)
 - Channel features (depends on `channel_members` table)
-- I2We submissions (depends on `i2we_submissions` table)
+- i2We submissions (depends on `i2we_submissions` table)
 
 ---
 
@@ -93,7 +93,7 @@ The database connection is **fully operational** and secure.
 ### What Might Not Work:
 1. ⚠️ Joining/leaving houses (needs `memberships` table)
 2. ⚠️ Joining channels (needs `channel_members` table)
-3. ⚠️ I2We feature (needs `i2we_submissions` table)
+3. ⚠️ i2We feature (needs `i2we_submissions` table)
 
 ---
 

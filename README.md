@@ -8,7 +8,7 @@ A comprehensive business networking platform built with React Native and Expo.
 - **Push Notifications** - Real-time notifications for deals, links, and meetings
 - **Business Links** - Share verified business contacts with house members
 - **Deals Tracking** - Record and track business deals
-- **I2WE Meetings** - Schedule 1-on-1 meetings with members
+- **i2We Meetings** - Schedule 1-on-1 meetings with members
 - **Voice OS Integration** - Voice commands and transcription
 - **Knowledge Base** - AI-powered business knowledge search
 
@@ -126,7 +126,7 @@ eas build --platform all --profile production
 Push notifications are configured for:
 - Business links received
 - Deals recorded
-- I2WE meetings scheduled
+- i2We meetings scheduled
 - Meeting reminders
 - AI match suggestions
 

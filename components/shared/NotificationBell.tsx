@@ -165,7 +165,7 @@ export function NotificationBell() {
         } as any);
         break;
 
-      // ── I2WE meetings → i2we-meetings channel-detail ────────────────
+      // ── i2We meetings → i2we-meetings channel-detail ────────────────
       case 'i2we_meeting_scheduled':
       case 'i2we_meeting_recorded':
         router.push({

@@ -13,13 +13,13 @@ import { router } from 'expo-router';
 import { ChevronLeft, User, Calendar } from 'lucide-react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { colors, spacing } from '@/constants/theme';
-import { I2WEService } from '@/services/i2weService';
+import { I2WeService } from '@/services/i2weService';
 import { LinksService } from '@/services/linksService';
 import { UserProfile } from '@/types/database';
-import { sendI2WEMeetingRecordedNotification } from '@/utils/notificationHelpers';
+import { sendI2WeMeetingRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function I2WEForm() {
+export default function I2WeForm() {
   const { profile } = useAuth();
   const [selectedMember, setSelectedMember] = useState<UserProfile | null>(null);
   const [selectedHouse, setSelectedHouse] = useState<any>(null);
@@ -76,7 +76,7 @@ export default function I2WEForm() {
   const loadHouseMembers = async () => {
     if (!selectedHouse) return;
     try {
-      const members = await I2WEService.getHouseMembers(selectedHouse.id);
+      const members = await I2WeService.getHouseMembers(selectedHouse.id);
       setHouseMembers(members);
     } catch (error) {
       Alert.alert('Error', 'Failed to load members');
@@ -126,7 +126,7 @@ export default function I2WEForm() {
     }
 
     try {
-      const result = await I2WEService.createMeeting({
+      const result = await I2WeService.createMeeting({
         member_2_id: selectedMember.id,
         meeting_date: formData.meeting_date,
         notes: formData.notes,
@@ -134,7 +134,7 @@ export default function I2WEForm() {
 
       // Send notification to the selected member
       if (profile) {
-        await sendI2WEMeetingRecordedNotification({
+        await sendI2WeMeetingRecordedNotification({
           recipientId: selectedMember.id,
           meetingId: result?.id || '',
           recorderName: profile.full_name || 'A member',
@@ -168,7 +168,7 @@ export default function I2WEForm() {
         <TouchableOpacity onPress={() => router.replace('/(tabs)')} style={styles.backButton}>
           <ChevronLeft size={24} color={colors.text_primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Log I2WE Meeting</Text>
+        <Text style={styles.headerTitle}>Log i2We Meeting</Text>
       </View>
 
       <ScrollView
@@ -177,7 +177,7 @@ export default function I2WEForm() {
         nestedScrollEnabled
         keyboardShouldPersistTaps="handled">
         <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>I2WE - I to WE</Text>
+          <Text style={styles.infoTitle}>i2We - I to WE</Text>
           <Text style={styles.infoDescription}>
             Connect 1-on-1 with fellow house members to build meaningful business relationships
           </Text>

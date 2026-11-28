@@ -7,7 +7,7 @@ When clicking on the "Links Form" button in the Android app, users were seeing a
 The issue was traced to overly aggressive error throwing in service layer methods:
 - `LinksService.getUserHouses()` - threw exceptions instead of gracefully handling missing data
 - `LinksService.getHouseMembers()` - threw when profiles were missing
-- `I2WEService.getHouseMembers()` - threw when `users_profile` table wasn't accessible
+- `i2WeService.getHouseMembers()` - threw when `users_profile` table wasn't accessible
 - `DealsService` - had the same issues via form components
 
 **Errors occurred when:**
@@ -33,7 +33,7 @@ The issue was traced to overly aggressive error throwing in service layer method
 - ✅ Returns empty array instead of throwing
 - ✅ Added console logging for debugging
 
-### 2. Fixed I2WEService [COMPLETED]
+### 2. Fixed i2WeService [COMPLETED]
 **File:** `services/i2weService.ts`
 
 #### `getHouseMembers()` Changes:
@@ -54,7 +54,7 @@ The issue was traced to overly aggressive error throwing in service layer method
 - ✅ Improved error handling with console hints
 - ✅ Better error messaging guidance
 
-### 4. Updated I2WE Form [COMPLETED]
+### 4. Updated i2We Form [COMPLETED]
 **File:** `app/i2we-form.tsx`
 
 #### `loadUserHouses()` and `loadHouseMembers()` Changes:
@@ -111,7 +111,7 @@ When testing the new Android build, verify:
 - [ ] House members list populates correctly
 - [ ] Send deal notification succeeds
 
-### I2WE Form
+### i2We Form
 - [ ] Click "1on1" button in app navigation
 - [ ] Houses list loads without error
 - [ ] House members list populates correctly

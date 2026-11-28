@@ -58,7 +58,7 @@ SELECT id, from_user_id, to_user_id, title FROM core_links LIMIT 5;
 -- Test 5: Get deals
 SELECT id, creator_id, title, amount FROM core_deals LIMIT 5;
 
--- Test 6: Get I2WE meetings
+-- Test 6: Get i2We meetings
 SELECT id, member_1_id, member_2_id, meeting_date FROM core_i2we LIMIT 5;
 
 -- All these should return data if data exists in your database

@@ -97,7 +97,7 @@ This updates:
 All tables have RLS enabled with policies that:
 - Users can only access their own profile data
 - House members can only see their house's data
-- Links and I2WE meetings restricted to same-house members
+- Links and i2We meetings restricted to same-house members
 - WeVysya deals visible to all, house deals restricted
 - Proper authentication checks on all operations
 

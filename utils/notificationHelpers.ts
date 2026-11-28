@@ -193,9 +193,9 @@ export async function sendAttendanceMarkedNotification(params: {
 }
 
 /**
- * 📅 Send I2WE Meeting Scheduled Notification
+ * 📅 Send i2We Meeting Scheduled Notification
  */
-export async function sendI2WEMeetingScheduledNotification(params: {
+export async function sendI2WeMeetingScheduledNotification(params: {
   recipientId: string;
   meetingId: string;
   schedulerName: string;
@@ -206,7 +206,7 @@ export async function sendI2WEMeetingScheduledNotification(params: {
   return sendNotification({
     userId: params.recipientId,
     type: 'i2we_meeting_scheduled',
-    title: '📅 I2WE Meeting Scheduled',
+    title: '📅 i2We Meeting Scheduled',
     body: `${params.schedulerName} has scheduled a 1-on-1 meeting with you on ${params.meetingDate}.`,
     data: {
       meetingId: params.meetingId,
@@ -220,9 +220,9 @@ export async function sendI2WEMeetingScheduledNotification(params: {
 }
 
 /**
- * 📅 Send I2WE Meeting Recorded Notification
+ * 📅 Send i2We Meeting Recorded Notification
  */
-export async function sendI2WEMeetingRecordedNotification(params: {
+export async function sendI2WeMeetingRecordedNotification(params: {
   recipientId: string;
   meetingId: string;
   recorderName: string;
@@ -233,7 +233,7 @@ export async function sendI2WEMeetingRecordedNotification(params: {
   return sendNotification({
     userId: params.recipientId,
     type: 'i2we_meeting_recorded',
-    title: '✅ I2WE Meeting Recorded',
+    title: '✅ i2We Meeting Recorded',
     body: `${params.recorderName} recorded a completed 1-on-1 meeting with you on ${params.meetingDate}.`,
     data: {
       meetingId: params.meetingId,

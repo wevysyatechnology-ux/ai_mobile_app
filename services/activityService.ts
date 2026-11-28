@@ -1,6 +1,6 @@
 import { LinksService } from './linksService';
 import { DealsService } from './dealsService';
-import { I2WEService } from './i2weService';
+import { I2WeService } from './i2weService';
 import { Activity } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -11,7 +11,7 @@ export const ActivityService = {
             const [links, deals, meetings] = await Promise.all([
                 LinksService.getMyLinks().catch(() => []),
                 DealsService.getMyDeals().catch(() => []),
-                I2WEService.getMyMeetings().catch(() => []),
+                I2WeService.getMyMeetings().catch(() => []),
             ]);
 
             const activities: Activity[] = [];
@@ -45,7 +45,7 @@ export const ActivityService = {
                 activities.push({
                     id: `meeting-${meeting.id}`,
                     type: 'meeting',
-                    title: 'I2WE Meeting',
+                    title: 'i2We Meeting',
                     message: meeting.notes || `Meeting Scheduled for ${new Date(meeting.meeting_date).toLocaleDateString()}`,
                     timestamp: meeting.created_at,
                     action_label: 'Details',

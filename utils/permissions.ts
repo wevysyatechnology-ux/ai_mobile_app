@@ -17,7 +17,7 @@ export const permissions = {
     return verticalType === 'inner_circle';
   },
 
-  canScheduleI2WE: (verticalType: VerticalType | null | undefined): boolean => {
+  canScheduleI2We: (verticalType: VerticalType | null | undefined): boolean => {
     return verticalType === 'inner_circle';
   },
 

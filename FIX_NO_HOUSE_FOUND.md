@@ -145,7 +145,7 @@ Once you've assigned a house to your user:
 4. ✅ Amount field
 5. ✅ Create Deal button
 
-### 1on1 (I2WE) Form should show:
+### 1on1 (i2We) Form should show:
 1. ✅ "Choose Member" dropdown with other house members
 2. ✅ Meeting date picker
 3. ✅ Notes field

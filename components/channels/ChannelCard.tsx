@@ -55,15 +55,23 @@ export function ChannelCard({
   descriptionOverride,
 }: ChannelCardProps) {
   const IconComponent = getChannelIcon(channel);
-  const isI2WEChannel =
+  const isI2WeChannel =
     (channel.slug || '').toLowerCase().includes('i2we') ||
     (channel.slug || '').toLowerCase().includes('12we') ||
     (channel.slug || '').toLowerCase().includes('meeting') ||
     (channel.name || '').toLowerCase().includes('i2we') ||
     (channel.name || '').toLowerCase().includes('meeting');
 
+  const isLinksChannel =
+    (channel.slug || '').toLowerCase() === 'links' ||
+    (channel.name || '').toLowerCase() === 'links';
+
   const displayDescription = descriptionOverride ||
-    (isI2WEChannel ? 'Track i2We meetings' : channel.description);
+    (isI2WeChannel
+      ? 'Track i2We meetings'
+      : isLinksChannel
+        ? 'Share business links and opportunities'
+        : channel.description);
 
   return (
     <TouchableOpacity

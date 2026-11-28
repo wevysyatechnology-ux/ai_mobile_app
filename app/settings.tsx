@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { ShieldCheck, ChevronLeft, Info } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import { useAIConsent } from '@/contexts/AIConsentContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function Settings() {
   const { consentStatus, isConsentGranted, grantConsent, denyConsent } = useAIConsent();
@@ -178,6 +179,7 @@ export default function Settings() {
           WeVysya respects your privacy. You have full control over how your data is
           used for AI features.
         </Text>
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

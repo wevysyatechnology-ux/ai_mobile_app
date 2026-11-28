@@ -5,6 +5,7 @@ import { ChevronLeft, Phone, User as UserIcon } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 interface HouseDetails {
   name: string;
@@ -165,6 +166,7 @@ export default function MemberProfileScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        <DevelopedByFooter />
       </View>
     </View>
   );

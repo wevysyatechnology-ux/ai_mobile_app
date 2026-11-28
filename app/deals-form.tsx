@@ -8,6 +8,7 @@ import { LinksService } from '@/services/linksService';
 import { UserProfile } from '@/types/database';
 import { sendDealRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function DealsForm() {
   const { profile } = useAuth();
@@ -205,6 +206,7 @@ export default function DealsForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Create Deal</Text>
         </TouchableOpacity>
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

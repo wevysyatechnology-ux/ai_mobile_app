@@ -29,6 +29,7 @@ import {
 import PostCard from '@/components/channels/PostCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { supabase } from '@/lib/supabase';
 import { format, isToday, isTomorrow } from 'date-fns';
 
@@ -618,6 +619,7 @@ export default function ChannelDetailScreen() {
               )}
             </>
           )}
+          <DevelopedByFooter />
         </View>
       </ScrollView>
 

@@ -16,6 +16,7 @@ import {
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authService } from '@/services/authService';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { colors } from '@/constants/theme';
 
 export default function SignupScreen() {
@@ -332,6 +333,7 @@ export default function SignupScreen() {
                 </Text>
               </View>
             </Animated.View>
+            <DevelopedByFooter />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

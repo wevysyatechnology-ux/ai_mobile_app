@@ -16,6 +16,7 @@ import { UserCircle } from 'lucide-react-native';
 import { authService } from '@/services/authService';
 import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
@@ -218,6 +219,7 @@ export default function ProfileSetupScreen() {
                 )}
               </TouchableOpacity>
             </View>
+            <DevelopedByFooter />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

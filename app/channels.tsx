@@ -13,6 +13,7 @@ import { channelsService } from '@/services/channelsService';
 import { Channel } from '@/types/database';
 import { ChannelCard } from '@/components/channels/ChannelCard';
 import { COLORS, SPACING, TYPOGRAPHY } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function ChannelsScreen() {
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -131,6 +132,7 @@ export default function ChannelsScreen() {
             </View>
           </>
         )}
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

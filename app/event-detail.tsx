@@ -24,6 +24,7 @@ import {
 import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/constants/theme';
 import { EventsService, EventMeeting } from '@/services/eventsService';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 function formatEventDate(dateStr: string): string {
   const date = new Date(dateStr + 'T00:00:00');
@@ -190,6 +191,7 @@ export default function EventDetail() {
             activeOpacity={0.8}>
             <Text style={styles.allEventsBtnText}>View All Events</Text>
           </TouchableOpacity>
+          <DevelopedByFooter />
         </ScrollView>
       )}
     </View>

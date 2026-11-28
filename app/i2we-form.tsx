@@ -18,6 +18,7 @@ import { LinksService } from '@/services/linksService';
 import { UserProfile } from '@/types/database';
 import { sendI2WeMeetingRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function I2WeForm() {
   const { profile } = useAuth();
@@ -277,6 +278,7 @@ export default function I2WeForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Save Meeting</Text>
         </TouchableOpacity>
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

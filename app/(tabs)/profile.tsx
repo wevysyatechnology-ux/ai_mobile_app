@@ -8,6 +8,7 @@ import AIProfileActions from '@/components/profile/AIProfileActions';
 import MembershipCard from '@/components/profile/MembershipCard';
 import AttendanceStatusBanner from '@/components/profile/AttendanceStatusBanner';
 import FloatingLogo from '@/components/shared/FloatingLogo';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { LogOut, Trash2, Lock, Settings } from 'lucide-react-native';
 
 export default function Profile() {
@@ -268,6 +269,7 @@ export default function Profile() {
           <Trash2 size={20} color={colors.danger_red} strokeWidth={2} />
           <Text style={styles.deleteText}>Delete my account</Text>
         </TouchableOpacity>
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

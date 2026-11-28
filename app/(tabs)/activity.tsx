@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { colors, spacing, borderRadius, fontSize } from '@/constants/theme';
 import AIEmptyState from '@/components/shared/AIEmptyState';
 import FloatingLogo from '@/components/shared/FloatingLogo';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { LinksService } from '@/services/linksService';
 import { DealsService } from '@/services/dealsService';
 import { I2WeService } from '@/services/i2weService';
@@ -441,6 +442,7 @@ export default function Activity() {
           aiSuggestions.length === 0 && (
           <AIEmptyState message="Want me to suggest people you should connect with?" />
         )}
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

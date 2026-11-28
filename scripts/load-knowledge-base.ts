@@ -166,7 +166,7 @@ Best practices:
 - Follow up with action items`,
     metadata: {
       title: 'What are i2We Meetings?',
-      category: 'i2we',
+      category: 'i2We',
       source: 'user_guide',
     },
   },

@@ -396,10 +396,10 @@ export default function VoiceAssistantScreen() {
           </Pressable>
 
           <Pressable
-            onPress={() => handleTestMode('Create i2we connection')}
+            onPress={() => handleTestMode('Create i2We connection')}
             className="bg-orange-700 px-4 py-3 rounded-lg"
           >
-            <Text className="text-white font-medium">Create i2we</Text>
+            <Text className="text-white font-medium">Create i2We</Text>
           </Pressable>
 
           <Pressable

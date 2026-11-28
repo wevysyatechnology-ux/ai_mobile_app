@@ -66,7 +66,7 @@ export default function ChannelDetailScreen() {
     if (normalizedSlug.includes('link')) return 'links';
     if (normalizedSlug.includes('deal')) return 'deals';
     if (
-      normalizedSlug.includes('i2we') ||
+      normalizedSlug.includes('i2We') ||
       normalizedSlug.includes('12we') ||
       normalizedSlug.includes('meeting')
     ) {
@@ -131,10 +131,10 @@ export default function ChannelDetailScreen() {
     const normalizedSlug = (targetChannel.slug || '').toLowerCase();
     const normalizedName = (targetChannel.name || '').toLowerCase();
     const isI2WeChannel =
-      normalizedSlug.includes('i2we') ||
+      normalizedSlug.includes('i2We') ||
       normalizedSlug.includes('12we') ||
       normalizedSlug.includes('meeting') ||
-      normalizedName.includes('i2we') ||
+      normalizedName.includes('i2We') ||
       normalizedName.includes('meeting');
     const isLinksChannel =
       normalizedSlug === 'links' || normalizedName === 'links';

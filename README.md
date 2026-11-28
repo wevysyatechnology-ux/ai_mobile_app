@@ -103,7 +103,7 @@ eas build --platform all --profile production
 ├── app/                    # Expo Router screens
 │   ├── (tabs)/            # Tab navigation screens
 │   ├── auth/              # Authentication screens
-│   └── *-form.tsx         # Form screens (deals, links, i2we)
+│   └── *-form.tsx         # Form screens (deals, links, i2We)
 ├── components/            # Reusable components
 │   ├── activity/
 │   ├── ai/

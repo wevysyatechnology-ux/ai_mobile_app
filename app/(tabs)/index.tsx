@@ -195,7 +195,7 @@ export default function Home() {
             <View style={styles.actionIconBox}>
               <Users size={28} color={colors.accent_green_bright} strokeWidth={2.5} />
             </View>
-            <Text style={styles.actionTitle}>i2we</Text>
+            <Text style={styles.actionTitle}>i2We</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

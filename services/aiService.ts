@@ -80,12 +80,12 @@ export class AIService {
       };
     }
 
-    // i2we / Connect
-    if (this.matchesKeywords(lowerText, ['i2we', 'i to we', 'connect', 'introduce me'])) {
+    // i2We / Connect
+    if (this.matchesKeywords(lowerText, ['i2We', 'i to we', 'connect', 'introduce me'])) {
       return {
-        intent: 'i2we',
+        intent: 'i2We',
         screen_to_open: '/i2we-form',
-        message: 'Opening i2we connection form. Stop thinking "I", start thinking "WE"!',
+        message: 'Opening i2We connection form. Stop thinking "I", start thinking "WE"!',
         shouldSpeak: true,
       };
     }
@@ -145,7 +145,7 @@ export class AIService {
       return {
         intent: 'general',
         screen_to_open: null,
-        message: 'I can help you find members, post deals and links, connect people through i2we, and much more. Just tell me what you need!',
+        message: 'I can help you find members, post deals and links, connect people through i2We, and much more. Just tell me what you need!',
         shouldSpeak: true,
       };
     }

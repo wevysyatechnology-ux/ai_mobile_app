@@ -177,7 +177,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 Apply all migrations in order:
 
 1. Create core tables and channels
-2. Update links, deals, i2we with house restrictions
+2. Update links, deals, i2We with house restrictions
 3. Add GHM admin features (attendance, approvals, audit)
 
 Use Supabase CLI or dashboard to apply migrations from `supabase/migrations/`.

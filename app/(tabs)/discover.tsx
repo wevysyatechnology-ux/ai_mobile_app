@@ -57,7 +57,7 @@ export default function Discover() {
       slug: 'links',
       icon: Link,
       title: 'Links',
-      subtitle: 'Send and receive business referrals',
+      subtitle: 'Send and receive business links',
       color: colors.accent_green_bright,
       route: '/links-form' as const,
     },

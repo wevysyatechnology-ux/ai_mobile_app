@@ -76,7 +76,7 @@ This updates:
 - **core_house_members**: User-house relationships
 
 ### Collaboration Tools
-- **core_links**: Business referrals (house-restricted)
+- **core_links**: Business links (house-restricted)
   - Include contact details and urgency ratings
   - Can only be sent to same-house members
 

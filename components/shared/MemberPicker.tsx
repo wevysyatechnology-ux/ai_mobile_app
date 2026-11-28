@@ -28,7 +28,7 @@ interface MemberPickerProps {
 }
 
 /**
- * Member chooser for the Link / Deal / I2WE forms: "In House" lists the member's own house;
+ * Member chooser for the Link / Deal / I2We forms: "In House" lists the member's own house;
  * "Out House" lets them drill down country -> state -> zone -> house to reach members of any other
  * house. Both have a name search. Members come from the get_house_members RPC, which works for any
  * house id (and already hides ineligible/suspended members and the signed-in member).

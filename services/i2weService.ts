@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { CoreI2WE, UserProfile } from '@/types/database';
+import { CoreI2We, UserProfile } from '@/types/database';
 
 export interface CreateMeetingData {
   member_2_id: string;
@@ -7,7 +7,7 @@ export interface CreateMeetingData {
   notes?: string;
 }
 
-export const I2WEService = {
+export const I2WeService = {
   async getHouseMembers(houseId: string): Promise<UserProfile[]> {
     // Get current user to exclude them from the list
     const { data: userData } = await supabase.auth.getUser();
@@ -74,7 +74,7 @@ export const I2WEService = {
     }
   },
 
-  async createMeeting(meetingData: CreateMeetingData): Promise<CoreI2WE> {
+  async createMeeting(meetingData: CreateMeetingData): Promise<CoreI2We> {
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('Not authenticated');
@@ -111,12 +111,12 @@ export const I2WEService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('I2WEService.createMeeting - exception:', error);
+      console.error('i2WeService.createMeeting - exception:', error);
       throw error;
     }
   },
 
-  async getMyMeetings(): Promise<CoreI2WE[]> {
+  async getMyMeetings(): Promise<CoreI2We[]> {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error('Not authenticated');
 
@@ -180,7 +180,7 @@ export const I2WEService = {
 
       return (count1 || 0) + (count2 || 0);
     } catch (error) {
-      console.error('I2WEService.getMeetingsCount - exception:', error);
+      console.error('i2WeService.getMeetingsCount - exception:', error);
       return 0;
     }
   },

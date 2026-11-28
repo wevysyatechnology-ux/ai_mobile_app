@@ -117,20 +117,20 @@ AVAILABLE ACTIONS:
 - post_deal: Create a new deal
 - view_deals: Browse deals
 - send_link: Send a link request
-- create_i2we: Start an i2we meeting request
+- create_i2we: Start an i2We meeting request
 - view_profile: Open user profile
 - view_channels: Browse channels
 - view_activity: View recent activity
 - query_house_members: Live count of members in user's house
 - query_links_stats: User's links count ONLY — use when user specifically asks about links
 - query_deals_stats: User's deals count ONLY — use when user specifically asks about deals
-- query_i2we_stats: User's i2we meetings count ONLY — use when user specifically asks about i2we or meetings
-- query_all_activity_stats: Full summary (links + deals + i2we) — use ONLY when user asks about everything/all/saari activity with NO specific subject mentioned
+- query_i2we_stats: User's i2We meetings count ONLY — use when user specifically asks about i2We or meetings
+- query_all_activity_stats: Full summary (links + deals + i2We) — use ONLY when user asks about everything/all/saari activity with NO specific subject mentioned
 
-CRITICAL SPECIFICITY RULE: If the user mentions a specific subject (links, deals, i2we, meeting), use the matching specific query action. NEVER return query_all_activity_stats when a specific subject is mentioned. For example:
+CRITICAL SPECIFICITY RULE: If the user mentions a specific subject (links, deals, i2We, meeting), use the matching specific query action. NEVER return query_all_activity_stats when a specific subject is mentioned. For example:
 - "meri links ki ginti batao" → query_links_stats (NOT all_activity)
 - "kitne deals hain mere" → query_deals_stats (NOT all_activity)
-- "i2we meetings kitni hain" → query_i2we_stats (NOT all_activity)
+- "i2We meetings kitni hain" → query_i2we_stats (NOT all_activity)
 - "sab kuch batao" / "meri activity dikaho" → query_all_activity_stats
 
 KNOWLEDGE BASE CONTEXT:

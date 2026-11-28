@@ -480,10 +480,10 @@ class VoiceOSService {
         `Participating in: ${stats.as_participant}\n` +
         `Summary: ${spokenSummary}`;
     } else if (actionName === 'query_i2we_stats' && stats) {
-      title = 'User i2we Activity';
+      title = 'User i2We Activity';
       category = 'user_activity';
       content =
-        `User i2we Meetings Summary (auto-updated):\n` +
+        `User i2We Meetings Summary (auto-updated):\n` +
         `Total meetings: ${stats.total}\n` +
         `Scheduled: ${stats.scheduled}\n` +
         `Completed: ${stats.completed}\n` +
@@ -492,12 +492,12 @@ class VoiceOSService {
     } else if (actionName === 'query_all_activity_stats' && stats) {
       title = 'User Full Activity Summary';
       category = 'user_activity';
-      const { links, deals, i2we } = stats;
+      const { links, deals, i2We } = stats;
       content =
         `User Full Activity Summary (auto-updated):\n` +
         `Links — total: ${links?.total}, open: ${links?.open}, closed: ${links?.closed}\n` +
         `Deals — total: ${deals?.total}, open: ${deals?.open}, completed: ${deals?.completed}\n` +
-        `i2we — total: ${i2we?.total}, scheduled: ${i2we?.scheduled}, completed: ${i2we?.completed}\n` +
+        `i2We — total: ${i2We?.total}, scheduled: ${i2We?.scheduled}, completed: ${i2We?.completed}\n` +
         `Summary: ${spokenSummary}`;
     }
 

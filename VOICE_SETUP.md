@@ -91,7 +91,7 @@ User speaks → Record Audio → Upload to Supabase Edge Function
 - "Find a CA in Bangalore"
 - "Post a deal"
 - "Send a link request"
-- "Create an i2we connection"
+- "Create an i2We connection"
 - "Show me lawyers in Mumbai"
 - And more...
 

@@ -303,7 +303,7 @@ testVoiceOS();
 - "Introduce someone"
 
 ### I2WE Actions:
-- "Create an i2we meeting"
+- "Create an i2We meeting"
 - "Schedule a one-on-one"
 - "Request a meeting"
 

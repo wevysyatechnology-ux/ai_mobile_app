@@ -1,7 +1,7 @@
 /**
  * 🔍 Activity Query Service — READ-ONLY
  *
- * Fetches summary statistics for the current user's Links, Deals, and i2we records.
+ * Fetches summary statistics for the current user's Links, Deals, and i2We records.
  * Used exclusively by Voice Assistant. No write operations are performed here.
  */
 import { supabase } from '@/lib/supabase';
@@ -23,7 +23,7 @@ export interface ActivityStats {
     as_creator: number;
     as_participant: number;
   };
-  i2we: {
+  i2We: {
     total: number;
     scheduled: number;
     completed: number;
@@ -91,8 +91,8 @@ const ActivityQueryService = {
     };
   },
 
-  /** Fetch i2we meeting stats for the current user */
-  async getI2weStats(): Promise<ActivityStats['i2we']> {
+  /** Fetch i2We meeting stats for the current user */
+  async getI2weStats(): Promise<ActivityStats['i2We']> {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error('Not authenticated');
     const uid = userData.user.id;
@@ -115,12 +115,12 @@ const ActivityQueryService = {
 
   /** Fetch all stats in parallel */
   async getAllStats(): Promise<ActivityStats> {
-    const [links, deals, i2we] = await Promise.all([
+    const [links, deals, i2We] = await Promise.all([
       this.getLinkStats(),
       this.getDealStats(),
       this.getI2weStats(),
     ]);
-    return { links, deals, i2we };
+    return { links, deals, i2We };
   },
 };
 

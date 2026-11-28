@@ -91,7 +91,7 @@ supabase migration up
 The knowledge base includes:
 - WeVysya vision and mission
 - House system explanation
-- i2we connection details
+- i2We connection details
 - Deals and links features
 - Channel system
 - How to use the assistant
@@ -142,13 +142,13 @@ await addKnowledge(
 → Shows all available deals
 ```
 
-**i2we Connections:**
+**i2We Connections:**
 ```
-"Create i2we connection"
-→ Opens i2we form for collective requests
+"Create i2We connection"
+→ Opens i2We form for collective requests
 
 "I need help with..."
-→ Interprets need and creates i2we
+→ Interprets need and creates i2We
 ```
 
 **Knowledge Questions:**
@@ -156,7 +156,7 @@ await addKnowledge(
 "What is WeVysya?"
 → Uses RAG to answer from knowledge base
 
-"How do i2we connections work?"
+"How do i2We connections work?"
 → Retrieves relevant documentation
 ```
 
@@ -284,7 +284,7 @@ Pre-loaded categories:
 - `vision`: WeVysya's vision and goals
 - `houses`: Regional community structure
 - `membership`: Membership details
-- `features`: Deals, links, i2we
+- `features`: Deals, links, i2We
 - `events`: Event information
 - `platform`: Platform features
 - `help`: How to use the assistant
@@ -293,7 +293,7 @@ Pre-loaded categories:
 
 The system understands:
 - **Knowledge queries**: Questions about WeVysya
-- **Action commands**: Member searches, deal posts, i2we, etc.
+- **Action commands**: Member searches, deal posts, i2We, etc.
 - **Ambiguous requests**: Clarifies intent with RAG
 
 ### Preventing Hallucination
@@ -315,7 +315,7 @@ The voice assistant screen includes quick test commands:
 - "Find CA in Bengaluru"
 - "What is WeVysya?"
 - "Post a deal"
-- "Create i2we"
+- "Create i2We"
 
 No microphone needed - just tap buttons!
 
@@ -447,7 +447,7 @@ voiceOS.speak(response, {
 - Modular services
 
 ✅ **WeVysya-Specific**
-- Knows about members, houses, deals, i2we
+- Knows about members, houses, deals, i2We
 - Can find people by profession/location
 - Understands community features
 - Guides users through platform

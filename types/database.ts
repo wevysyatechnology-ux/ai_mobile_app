@@ -106,7 +106,7 @@ export interface DealParticipant {
   joined_at: string;
 }
 
-export interface CoreI2WE {
+export interface CoreI2We {
   id: string;
   member_1_id: string;
   member_2_id: string;

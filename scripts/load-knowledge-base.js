@@ -181,8 +181,8 @@ Best practices:
 - Respect scheduled time
 - Follow up with action items`,
     metadata: {
-      title: 'What are I2We Meetings?',
-      category: 'i2we',
+      title: 'What are i2We Meetings?',
+      category: 'i2We',
       source: 'user_guide',
     },
   },
@@ -207,7 +207,7 @@ You can use voice commands for:
    "Send a link request to Rajesh"
    "Connect me with tax experts"
 
-4. CREATE I2WE:
+4. CREATE I2We:
    "Schedule a meeting with Priya"
    "Create an I2We for next Tuesday"
 
@@ -487,7 +487,7 @@ async function loadKnowledgeBase() {
     console.log('Users can ask questions like:');
     console.log('  - "What is WeVysya?"');
     console.log('  - "How do I post a deal?"');
-    console.log('  - "What are I2We meetings?"');
+    console.log('  - "What are i2We meetings?"');
     console.log('  - "How do I upgrade my membership?"');
     console.log('\nNext step: Deploy classify-intent function and test complete flow!');
   }

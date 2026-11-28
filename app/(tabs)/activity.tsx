@@ -5,8 +5,8 @@ import AIEmptyState from '@/components/shared/AIEmptyState';
 import FloatingLogo from '@/components/shared/FloatingLogo';
 import { LinksService } from '@/services/linksService';
 import { DealsService } from '@/services/dealsService';
-import { I2WEService } from '@/services/i2weService';
-import { CoreDeal, CoreI2WE, CoreLink } from '@/types/database';
+import { I2WeService } from '@/services/i2weService';
+import { CoreDeal, CoreI2We, CoreLink } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/lib/supabase';
@@ -27,7 +27,7 @@ export default function Activity() {
 
   const [links, setLinks] = useState<CoreLink[]>([]);
   const [deals, setDeals] = useState<CoreDeal[]>([]);
-  const [meetings, setMeetings] = useState<CoreI2WE[]>([]);
+  const [meetings, setMeetings] = useState<CoreI2We[]>([]);
   const [memberNames, setMemberNames] = useState<Record<string, string>>({});
 
   const [linkFilter, setLinkFilter] = useState<LinkFilter>('received');
@@ -49,7 +49,7 @@ export default function Activity() {
         const [myLinks, myDeals, myMeetings] = await Promise.all([
           LinksService.getMyLinks().catch(() => []),
           DealsService.getMyDeals().catch(() => []),
-          I2WEService.getMyMeetings().catch(() => []),
+          I2WeService.getMyMeetings().catch(() => []),
         ]);
 
         setLinks(myLinks);

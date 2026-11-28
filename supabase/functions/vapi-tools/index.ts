@@ -129,9 +129,9 @@ async function handleDashboardQuery(userId: string | null, entityType: string): 
       const s = await getDealStats(userId);
       return `You have ${s.total} deals total: ${s.open} open, ${s.in_progress} in progress, ${s.completed} completed, and ${s.closed} closed.`;
     }
-    if (entityType === 'i2we') {
+    if (entityType === 'i2We') {
       const s = await getI2weStats(userId);
-      return `You have ${s.total} i2we meetings total: ${s.scheduled} scheduled, ${s.completed} completed, and ${s.cancelled} cancelled.`;
+      return `You have ${s.total} i2We meetings total: ${s.scheduled} scheduled, ${s.completed} completed, and ${s.cancelled} cancelled.`;
     }
     return `Sorry, I don't know how to look up "${entityType}" yet.`;
   } catch (error) {

@@ -29,10 +29,10 @@ const getChannelIcon = (channel: Channel) => {
   if (slug.includes('link') || name.includes('link')) return LinkIcon;
   if (slug.includes('deal') || name.includes('deal')) return Handshake;
   if (
-    slug.includes('i2we') ||
+    slug.includes('i2We') ||
     slug.includes('12we') ||
     slug.includes('meeting') ||
-    name.includes('i2we') ||
+    name.includes('i2We') ||
     name.includes('meeting')
   ) {
     return Users;
@@ -55,15 +55,15 @@ export function ChannelCard({
   descriptionOverride,
 }: ChannelCardProps) {
   const IconComponent = getChannelIcon(channel);
-  const isI2WEChannel =
-    (channel.slug || '').toLowerCase().includes('i2we') ||
+  const isI2WeChannel =
+    (channel.slug || '').toLowerCase().includes('i2We') ||
     (channel.slug || '').toLowerCase().includes('12we') ||
     (channel.slug || '').toLowerCase().includes('meeting') ||
-    (channel.name || '').toLowerCase().includes('i2we') ||
+    (channel.name || '').toLowerCase().includes('i2We') ||
     (channel.name || '').toLowerCase().includes('meeting');
 
   const displayDescription = descriptionOverride ||
-    (isI2WEChannel ? 'Track one-on-one meetings' : channel.description);
+    (isI2WeChannel ? 'Track one-on-one meetings' : channel.description);
 
   return (
     <TouchableOpacity

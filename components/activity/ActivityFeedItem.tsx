@@ -16,7 +16,7 @@ interface ActivityFeedItemProps {
 
 const ICON_MAP = {
   deal: TrendingUp,
-  i2we: FileText,
+  i2We: FileText,
   visitor: UserPlus,
   meeting: Calendar,
   suggestion: Sparkles,

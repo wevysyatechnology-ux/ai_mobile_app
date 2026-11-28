@@ -86,11 +86,11 @@ class ActionEngine {
       description: 'Send a link request to connect people',
     });
 
-    // i2we actions
+    // i2We actions
     this.actionMap.set('create_i2we', {
-      handler: this.createI2we,
+      handler: this.createI2We,
       screen: '/i2we-form',
-      description: 'Create an i2we connection request',
+      description: 'Create an i2We connection request',
     });
 
     this.actionMap.set('create_voice_note', {
@@ -147,11 +147,11 @@ class ActionEngine {
     });
     this.actionMap.set('query_i2we_stats', {
       handler: this.queryI2weStats,
-      description: 'Query i2we meeting counts for the current user',
+      description: 'Query i2We meeting counts for the current user',
     });
     this.actionMap.set('query_all_activity_stats', {
       handler: this.queryAllActivityStats,
-      description: 'Query all activity (links + deals + i2we) counts for the current user',
+      description: 'Query all activity (links + deals + i2We) counts for the current user',
     });
   }
 
@@ -263,7 +263,7 @@ class ActionEngine {
       return {
         type: 'knowledge',
         category: 'help',
-        response: 'I can help you find members, post deals, send links, create i2we requests, check your activity, and answer questions about WeVysya. Just ask naturally!',
+        response: 'I can help you find members, post deals, send links, create i2We requests, check your activity, and answer questions about WeVysya. Just ask naturally!',
         confidence: 0.95,
       };
     }
@@ -378,27 +378,27 @@ class ActionEngine {
       };
     }
 
-    // ── 4d. i2we stats — all 6 languages ────────────────────────────────────
+    // ── 4d. i2We stats — all 6 languages ────────────────────────────────────
     if (
       // English
-      /how many.*i2we|i2we.*count|meeting.*count|how many.*meeting/.test(q) ||
+      /how many.*i2We|i2we.*count|meeting.*count|how many.*meeting/.test(q) ||
       // Hindi Devanagari + Hinglish romanized
-      /गिनती.*i2we|i2we.*गिनती|कितने.*i2we|मीटिंग.*गिनती|कितनी.*मीटिंग|मेरी.*मीटिंग/.test(q) ||
-      /kitne.*i2we|i2we.*kitne|kitni.*meeting|i2we.*ki.*ginti|meeting.*ki.*ginti|ginti.*i2we|i2we.*ginti|i2we.*batao|i2we.*ke.*baare/.test(q) ||
+      /गिनती.*i2We|i2we.*गिनती|कितने.*i2We|मीटिंग.*गिनती|कितनी.*मीटिंग|मेरी.*मीटिंग/.test(q) ||
+      /kitne.*i2We|i2we.*kitne|kitni.*meeting|i2we.*ki.*ginti|meeting.*ki.*ginti|ginti.*i2We|i2we.*ginti|i2we.*batao|i2we.*ke.*baare/.test(q) ||
       // Tamil native + romanized
-      /எத்தனை.*i2we|எத்தனை.*meeting|i2we.*காட்டு|ethanai.*i2we|ethanai.*meeting/.test(q) ||
+      /எத்தனை.*i2We|எத்தனை.*meeting|i2we.*காட்டு|ethanai.*i2We|ethanai.*meeting/.test(q) ||
       // Telugu native + romanized
-      /ఎన్ని.*i2we|ఎన్ని.*meeting|i2we.*చూపించు|enni.*i2we|enni.*meeting/.test(q) ||
+      /ఎన్ని.*i2We|ఎన్ని.*meeting|i2we.*చూపించు|enni.*i2We|enni.*meeting/.test(q) ||
       // Kannada native + romanized
-      /ಎಷ್ಟು.*i2we|ಎಷ್ಟು.*meeting|i2we.*ತೋರಿಸು|eshtu.*i2we|eshtu.*meeting/.test(q) ||
+      /ಎಷ್ಟು.*i2We|ಎಷ್ಟು.*meeting|i2we.*ತೋರಿಸು|eshtu.*i2We|eshtu.*meeting/.test(q) ||
       // Malayalam native + romanized
-      /എത്ര.*i2we|എത്ര.*meeting|i2we.*കാണിക്കൂ|ethra.*i2we|ethra.*meeting/.test(q)
+      /എത്ര.*i2We|എത്ര.*meeting|i2we.*കാണിക്കൂ|ethra.*i2We|ethra.*meeting/.test(q)
     ) {
       return {
         type: 'action',
         category: 'query_i2we_stats',
         action: { name: 'query_i2we_stats', parameters: {} },
-        response: 'Let me check your i2we meeting activity.',
+        response: 'Let me check your i2We meeting activity.',
         confidence: 0.95,
       };
     }
@@ -406,7 +406,7 @@ class ActionEngine {
     // ── 4e. All activity summary — ONLY when NO specific subject mentioned ─────
     // Guard: skip this rule if query contains a specific subject (link/deal/i2we/meeting)
     // so "links ki ginti" never triggers all-activity.
-    const hasSpecificSubject = /link|deal|i2we|meeting/i.test(q);
+    const hasSpecificSubject = /link|deal|i2We|meeting/i.test(q);
     if (
       !hasSpecificSubject &&
       (
@@ -453,13 +453,13 @@ class ActionEngine {
       };
     }
 
-    // ── 6. i2we ─────────────────────────────────────────────────────────────
+    // ── 6. i2We ─────────────────────────────────────────────────────────────
     if (/create.*i2we|start.*i2we|i2we.*banao|new.*i2we/.test(q)) {
       return {
         type: 'action',
         category: 'create_i2we',
         action: { name: 'create_i2we', parameters: {}, screen: '/i2we-form' },
-        response: 'Opening the i2we creation form.',
+        response: 'Opening the i2We creation form.',
         confidence: 0.90,
       };
     }
@@ -795,7 +795,7 @@ class ActionEngine {
     };
   }
 
-  private async createI2we(params: any): Promise<any> {
+  private async createI2We(params: any): Promise<any> {
     return {
       success: true,
       navigation: true,
@@ -873,28 +873,28 @@ class ActionEngine {
     }
   }
 
-  /** Returns a localised spoken response for i2we stats */
+  /** Returns a localised spoken response for i2We stats */
   private buildI2weResponse(stats: Awaited<ReturnType<typeof ActivityQueryService.getI2weStats>>, lang: string): string {
     const { total: t, scheduled: sc, completed: cp, cancelled: ca } = stats;
     switch (lang) {
-      case 'hi': return `आपकी कुल ${t} i2we मीटिंग हैं। ${sc} निर्धारित, ${cp} पूरी और ${ca} रद्द।`;
-      case 'ta': return `உங்களுக்கு மொத்தம் ${t} i2we meetings உள்ளன. ${sc} திட்டமிட்டவை, ${cp} முடிந்தவை, ${ca} ரத்துசெய்யப்பட்டவை.`;
-      case 'te': return `మీకు మొత్తం ${t} i2we meetings ఉన్నాయి. ${sc} నిర్ణయించబడ్డాయి, ${cp} పూర్తి, ${ca} రద్దు.`;
-      case 'kn': return `ನಿಮಗೆ ಒಟ್ಟು ${t} i2we meetings ಇವೆ. ${sc} ನಿಗದಿಪಡಿಸಿದ, ${cp} ಮುಗಿದ, ${ca} ರದ್ದಾದ.`;
-      case 'ml': return `നിങ്ങൾക്ക് ആകെ ${t} i2we meetings ഉണ്ട്. ${sc} നിശ്ചയിച്ചത്, ${cp} പൂർത്തിയായത്, ${ca} റദ്ദാക്കിയത്.`;
-      default:   return `You have ${t} i2we meeting${t !== 1 ? 's' : ''} in total. ${sc} scheduled, ${cp} completed, and ${ca} cancelled.`;
+      case 'hi': return `आपकी कुल ${t} i2We मीटिंग हैं। ${sc} निर्धारित, ${cp} पूरी और ${ca} रद्द।`;
+      case 'ta': return `உங்களுக்கு மொத்தம் ${t} i2We meetings உள்ளன. ${sc} திட்டமிட்டவை, ${cp} முடிந்தவை, ${ca} ரத்துசெய்யப்பட்டவை.`;
+      case 'te': return `మీకు మొత్తం ${t} i2We meetings ఉన్నాయి. ${sc} నిర్ణయించబడ్డాయి, ${cp} పూర్తి, ${ca} రద్దు.`;
+      case 'kn': return `ನಿಮಗೆ ಒಟ್ಟು ${t} i2We meetings ಇವೆ. ${sc} ನಿಗದಿಪಡಿಸಿದ, ${cp} ಮುಗಿದ, ${ca} ರದ್ದಾದ.`;
+      case 'ml': return `നിങ്ങൾക്ക് ആകെ ${t} i2We meetings ഉണ്ട്. ${sc} നിശ്ചയിച്ചത്, ${cp} പൂർത്തിയായത്, ${ca} റദ്ദാക്കിയത്.`;
+      default:   return `You have ${t} i2We meeting${t !== 1 ? 's' : ''} in total. ${sc} scheduled, ${cp} completed, and ${ca} cancelled.`;
     }
   }
 
   /** Returns a localised spoken response for full activity summary */
-  private buildAllActivityResponse(links: any, deals: any, i2we: any, lang: string): string {
+  private buildAllActivityResponse(links: any, deals: any, i2We: any, lang: string): string {
     switch (lang) {
-      case 'hi': return `आपकी activity का सारांश: लिंक — कुल ${links.total} (${links.open} खुले)। डील — कुल ${deals.total} (${deals.open} खुले, ${deals.completed} पूरे)। i2we मीटिंग — कुल ${i2we.total} (${i2we.scheduled} आने वाले)।`;
-      case 'ta': return `உங்கள் activity சுருக்கம்: Links — மொத்தம் ${links.total} (${links.open} திறந்த). Deals — மொத்தம் ${deals.total} (${deals.open} திறந்த, ${deals.completed} முடிந்த). i2we meetings — மொத்தம் ${i2we.total} (${i2we.scheduled} வரவிருக்கும்).`;
-      case 'te': return `మీ activity సారాంశం: Links — మొత్తం ${links.total} (${links.open} తెరిచి). Deals — మొత్తం ${deals.total} (${deals.open} తెరిచి, ${deals.completed} పూర్తి). i2we meetings — మొత్తం ${i2we.total} (${i2we.scheduled} రాబోయేవి).`;
-      case 'kn': return `ನಿಮ್ಮ activity ಸಾರಾಂಶ: Links — ಒಟ್ಟು ${links.total} (${links.open} ತೆರೆದ). Deals — ಒಟ್ಟು ${deals.total} (${deals.open} ತೆರೆದ, ${deals.completed} ಮುಗಿದ). i2we meetings — ಒಟ್ಟು ${i2we.total} (${i2we.scheduled} ಮುಂಬರುವ).`;
-      case 'ml': return `നിങ്ങളുടെ activity സംഗ്രഹം: Links — ആകെ ${links.total} (${links.open} തുറന്നത്). Deals — ആകെ ${deals.total} (${deals.open} തുറന്നത്, ${deals.completed} പൂർത്തിയായത്). i2we meetings — ആകെ ${i2we.total} (${i2we.scheduled} വരുന്നവ).`;
-      default:   return `Your activity summary: Links — ${links.total} total (${links.open} open). Deals — ${deals.total} total (${deals.open} open, ${deals.completed} completed). i2we meetings — ${i2we.total} total (${i2we.scheduled} upcoming).`;
+      case 'hi': return `आपकी activity का सारांश: लिंक — कुल ${links.total} (${links.open} खुले)। डील — कुल ${deals.total} (${deals.open} खुले, ${deals.completed} पूरे)। i2We मीटिंग — कुल ${i2we.total} (${i2we.scheduled} आने वाले)।`;
+      case 'ta': return `உங்கள் activity சுருக்கம்: Links — மொத்தம் ${links.total} (${links.open} திறந்த). Deals — மொத்தம் ${deals.total} (${deals.open} திறந்த, ${deals.completed} முடிந்த). i2We meetings — மொத்தம் ${i2we.total} (${i2we.scheduled} வரவிருக்கும்).`;
+      case 'te': return `మీ activity సారాంశం: Links — మొత్తం ${links.total} (${links.open} తెరిచి). Deals — మొత్తం ${deals.total} (${deals.open} తెరిచి, ${deals.completed} పూర్తి). i2We meetings — మొత్తం ${i2we.total} (${i2we.scheduled} రాబోయేవి).`;
+      case 'kn': return `ನಿಮ್ಮ activity ಸಾರಾಂಶ: Links — ಒಟ್ಟು ${links.total} (${links.open} ತೆರೆದ). Deals — ಒಟ್ಟು ${deals.total} (${deals.open} ತೆರೆದ, ${deals.completed} ಮುಗಿದ). i2We meetings — ಒಟ್ಟು ${i2we.total} (${i2we.scheduled} ಮುಂಬರುವ).`;
+      case 'ml': return `നിങ്ങളുടെ activity സംഗ്രഹം: Links — ആകെ ${links.total} (${links.open} തുറന്നത്). Deals — ആകെ ${deals.total} (${deals.open} തുറന്നത്, ${deals.completed} പൂർത്തിയായത്). i2We meetings — ആകെ ${i2we.total} (${i2we.scheduled} വരുന്നവ).`;
+      default:   return `Your activity summary: Links — ${links.total} total (${links.open} open). Deals — ${deals.total} total (${deals.open} open, ${deals.completed} completed). i2We meetings — ${i2we.total} total (${i2we.scheduled} upcoming).`;
     }
   }
 
@@ -924,15 +924,15 @@ class ActionEngine {
       const spokenResponse = this.buildI2weResponse(stats, language);
       return { success: true, stats, spokenResponse };
     } catch (error) {
-      return { success: false, spokenResponse: this.errorMsg('i2we', language) };
+      return { success: false, spokenResponse: this.errorMsg('i2We', language) };
     }
   }
 
   private async queryAllActivityStats(_params: any, language: string = 'en'): Promise<any> {
     try {
-      const { links, deals, i2we } = await ActivityQueryService.getAllStats();
-      const spokenResponse = this.buildAllActivityResponse(links, deals, i2we, language);
-      return { success: true, stats: { links, deals, i2we }, spokenResponse };
+      const { links, deals, i2We } = await ActivityQueryService.getAllStats();
+      const spokenResponse = this.buildAllActivityResponse(links, deals, i2We, language);
+      return { success: true, stats: { links, deals, i2We }, spokenResponse };
     } catch (error) {
       return { success: false, spokenResponse: this.errorMsg('activity', language) };
     }

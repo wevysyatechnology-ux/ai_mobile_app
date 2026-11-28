@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Platform } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Handshake, Users, TrendingUp, Calendar, ChevronRight, Send, Inbox, CalendarClock } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import AnimatedBackground from '@/components/shared/AnimatedBackground';
@@ -21,11 +22,13 @@ import { actionEngine } from '@/services/actionEngine';
 import { knowledgeService } from '@/services/knowledgeService';
 import { ActivityService } from '@/services/activityService';
 import ActivityFeedItem from '@/components/activity/ActivityFeedItem';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { Activity } from '@/types';
 
 export default function Home() {
   const { profile } = useAuth();
   const { processIntent } = useAI();
+  const insets = useSafeAreaInsets();
   const [linksGivenCount, setLinksGivenCount] = useState(0);
   const [linksReceivedCount, setLinksReceivedCount] = useState(0);
   const [closedDealsCount, setClosedDealsCount] = useState(0);
@@ -147,7 +150,7 @@ export default function Home() {
     <View style={styles.container}>
       <AnimatedBackground />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: 160 + insets.bottom }]}
         showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
@@ -270,6 +273,8 @@ export default function Home() {
           <ChevronRight size={20} color={colors.accent_green_bright} />
         </TouchableOpacity>
 
+        <DevelopedByFooter />
+
       </ScrollView>
     </View >
   );
@@ -282,7 +287,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingTop: 60,
-    paddingBottom: 100,
   },
   header: {
     paddingHorizontal: spacing.xl,

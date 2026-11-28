@@ -1,5 +1,26 @@
 import { supabase } from '@/lib/supabase';
-import { Channel, ChannelPost } from '@/types/database';
+import {
+  Channel,
+  ChannelPost,
+  ChannelPostWithAuthor,
+  PostAuthor,
+} from '@/types/database';
+
+const AUTHOR_SELECT =
+  'id, full_name, avatar_url, membership_code, city, state, business_category';
+
+function mapAuthor(row: any): PostAuthor | null {
+  if (!row) return null;
+  return {
+    id: row.id,
+    full_name: row.full_name ?? null,
+    avatar_url: row.avatar_url ?? null,
+    membership_code: row.membership_code ?? null,
+    city: row.city ?? null,
+    state: row.state ?? null,
+    business_category: row.business_category ?? null,
+  };
+}
 
 export interface ChannelPostInput {
   channel_id: string;
@@ -67,6 +88,32 @@ export const channelsService = {
       return data || [];
     } catch (error) {
       console.error('Error fetching channel posts:', error);
+      return [];
+    }
+  },
+
+  async getChannelPostsWithAuthor(
+    channelId: string
+  ): Promise<ChannelPostWithAuthor[]> {
+    try {
+      const posts = await this.getChannelPosts(channelId);
+      if (posts.length === 0) return [];
+
+      const userIds = Array.from(new Set(posts.map((p) => p.user_id)));
+      const { data: authors } = await supabase
+        .from('users_profile')
+        .select(AUTHOR_SELECT)
+        .in('id', userIds);
+
+      const authorMap = new Map<string, PostAuthor>();
+      (authors || []).forEach((a: any) => {
+        const mapped = mapAuthor(a);
+        if (mapped) authorMap.set(mapped.id, mapped);
+      });
+
+      return posts.map((p) => ({ ...p, author: authorMap.get(p.user_id) ?? null }));
+    } catch (error) {
+      console.error('Error fetching channel posts with author:', error);
       return [];
     }
   },

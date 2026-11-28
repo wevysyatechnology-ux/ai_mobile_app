@@ -18,7 +18,15 @@ import { DealsService } from '@/services/dealsService';
 import { I2WeService } from '@/services/i2weService';
 import { LinksService } from '@/services/linksService';
 import { EventsService, EventMeeting } from '@/services/eventsService';
-import { Channel, ChannelPost, CoreDeal, CoreI2We, CoreLink } from '@/types/database';
+import {
+  Channel,
+  ChannelPost,
+  ChannelPostWithAuthor,
+  CoreDeal,
+  CoreI2We,
+  CoreLink,
+} from '@/types/database';
+import PostCard from '@/components/channels/PostCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
@@ -28,7 +36,7 @@ export default function ChannelDetailScreen() {
   const { channelId, channelSlug } = useLocalSearchParams();
   const { user } = useAuth();
   const [channel, setChannel] = useState<Channel | null>(null);
-  const [posts, setPosts] = useState<ChannelPost[]>([]);
+  const [posts, setPosts] = useState<ChannelPostWithAuthor[]>([]);
   const [links, setLinks] = useState<CoreLink[]>([]);
   const [deals, setDeals] = useState<CoreDeal[]>([]);
   const [meetings, setMeetings] = useState<CoreI2We[]>([]);
@@ -120,7 +128,7 @@ export default function ChannelDetailScreen() {
       return;
     }
 
-    const postsData = await channelsService.getChannelPosts(channelId as string);
+    const postsData = await channelsService.getChannelPostsWithAuthor(channelId as string);
     setPosts(postsData);
     setLinks([]);
     setDeals([]);
@@ -158,7 +166,7 @@ export default function ChannelDetailScreen() {
           filter: `channel_id=eq.${channel.id}`,
         },
         async () => {
-          const postsData = await channelsService.getChannelPosts(channel.id);
+          const postsData = await channelsService.getChannelPostsWithAuthor(channel.id);
           setPosts(postsData);
         }
       )
@@ -200,7 +208,8 @@ export default function ChannelDetailScreen() {
       });
 
       if (post) {
-        setPosts([post, ...posts]);
+        const refreshed = await channelsService.getChannelPostsWithAuthor(channel.id);
+        setPosts(refreshed);
         setNewPostTitle('');
         setNewPostContent('');
         setShowCreatePost(false);
@@ -600,13 +609,11 @@ export default function ChannelDetailScreen() {
                 </View>
               ) : (
                 posts.map((post) => (
-                  <View key={post.id} style={styles.postCard}>
-                    <Text style={styles.postTitle}>{post.title}</Text>
-                    {post.content && <Text style={styles.postContent}>{post.content}</Text>}
-                    <Text style={styles.postDate}>
-                      {new Date(post.created_at).toLocaleDateString()}
-                    </Text>
-                  </View>
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    currentUserId={user?.id ?? null}
+                  />
                 ))
               )}
             </>

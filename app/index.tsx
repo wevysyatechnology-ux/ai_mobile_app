@@ -33,5 +33,13 @@ export default function Index() {
     }
   }, [routing, isLoading, goToNextScreen]);
 
+  // Safety fallback: auto-advance after 30s if the user never taps Enter
+  useEffect(() => {
+    const fallback = setTimeout(() => {
+      goToNextScreen();
+    }, 30000);
+    return () => clearTimeout(fallback);
+  }, [goToNextScreen]);
+
   return <StartupLoadingView onEnter={goToNextScreen} />;
 }

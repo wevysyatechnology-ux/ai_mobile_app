@@ -889,12 +889,12 @@ class ActionEngine {
   /** Returns a localised spoken response for full activity summary */
   private buildAllActivityResponse(links: any, deals: any, i2We: any, lang: string): string {
     switch (lang) {
-      case 'hi': return `आपकी activity का सारांश: लिंक — कुल ${links.total} (${links.open} खुले)। डील — कुल ${deals.total} (${deals.open} खुले, ${deals.completed} पूरे)। i2We मीटिंग — कुल ${i2we.total} (${i2we.scheduled} आने वाले)।`;
-      case 'ta': return `உங்கள் activity சுருக்கம்: Links — மொத்தம் ${links.total} (${links.open} திறந்த). Deals — மொத்தம் ${deals.total} (${deals.open} திறந்த, ${deals.completed} முடிந்த). i2We meetings — மொத்தம் ${i2we.total} (${i2we.scheduled} வரவிருக்கும்).`;
-      case 'te': return `మీ activity సారాంశం: Links — మొత్తం ${links.total} (${links.open} తెరిచి). Deals — మొత్తం ${deals.total} (${deals.open} తెరిచి, ${deals.completed} పూర్తి). i2We meetings — మొత్తం ${i2we.total} (${i2we.scheduled} రాబోయేవి).`;
-      case 'kn': return `ನಿಮ್ಮ activity ಸಾರಾಂಶ: Links — ಒಟ್ಟು ${links.total} (${links.open} ತೆರೆದ). Deals — ಒಟ್ಟು ${deals.total} (${deals.open} ತೆರೆದ, ${deals.completed} ಮುಗಿದ). i2We meetings — ಒಟ್ಟು ${i2we.total} (${i2we.scheduled} ಮುಂಬರುವ).`;
-      case 'ml': return `നിങ്ങളുടെ activity സംഗ്രഹം: Links — ആകെ ${links.total} (${links.open} തുറന്നത്). Deals — ആകെ ${deals.total} (${deals.open} തുറന്നത്, ${deals.completed} പൂർത്തിയായത്). i2We meetings — ആകെ ${i2we.total} (${i2we.scheduled} വരുന്നവ).`;
-      default:   return `Your activity summary: Links — ${links.total} total (${links.open} open). Deals — ${deals.total} total (${deals.open} open, ${deals.completed} completed). i2We meetings — ${i2we.total} total (${i2we.scheduled} upcoming).`;
+      case 'hi': return `आपकी activity का सारांश: लिंक — कुल ${links.total} (${links.open} खुले)। डील — कुल ${deals.total} (${deals.open} खुले, ${deals.completed} पूरे)। i2We मीटिंग — कुल ${i2We.total} (${i2We.scheduled} आने वाले)।`;
+      case 'ta': return `உங்கள் activity சுருக்கம்: Links — மொத்தம் ${links.total} (${links.open} திறந்த). Deals — மொத்தம் ${deals.total} (${deals.open} திறந்த, ${deals.completed} முடிந்த). i2We meetings — மொத்தம் ${i2We.total} (${i2We.scheduled} வரவிருக்கும்).`;
+      case 'te': return `మీ activity సారాంశం: Links — మొత్తం ${links.total} (${links.open} తెరిచి). Deals — మొత్తం ${deals.total} (${deals.open} తెరిచి, ${deals.completed} పూర్తి). i2We meetings — మొత్తం ${i2We.total} (${i2We.scheduled} రాబోయేవి).`;
+      case 'kn': return `ನಿಮ್ಮ activity ಸಾರಾಂಶ: Links — ಒಟ್ಟು ${links.total} (${links.open} ತೆರೆದ). Deals — ಒಟ್ಟು ${deals.total} (${deals.open} ತೆರೆದ, ${deals.completed} ಮುಗಿದ). i2We meetings — ಒಟ್ಟು ${i2We.total} (${i2We.scheduled} ಮುಂಬರುವ).`;
+      case 'ml': return `നിങ്ങളുടെ activity സംഗ്രഹം: Links — ആകെ ${links.total} (${links.open} തുറന്നത്). Deals — ആകെ ${deals.total} (${deals.open} തുറന്നത്, ${deals.completed} പൂർത്തിയായത്). i2We meetings — ആകെ ${i2We.total} (${i2We.scheduled} വരുന്നവ).`;
+      default:   return `Your activity summary: Links — ${links.total} total (${links.open} open). Deals — ${deals.total} total (${deals.open} open, ${deals.completed} completed). i2We meetings — ${i2We.total} total (${i2We.scheduled} upcoming).`;
     }
   }
 

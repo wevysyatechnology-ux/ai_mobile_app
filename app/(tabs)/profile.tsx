@@ -10,6 +10,7 @@ import CapabilityKeywordsCard from '@/components/profile/CapabilityKeywordsCard'
 import AttendanceStatusBanner from '@/components/profile/AttendanceStatusBanner';
 import FloatingLogo from '@/components/shared/FloatingLogo';
 import { getVersionLabel } from '@/utils/appVersion';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { LogOut, Trash2, Lock, Settings } from 'lucide-react-native';
 
 export default function Profile() {
@@ -277,6 +278,7 @@ export default function Profile() {
         </TouchableOpacity>
 
         <Text style={styles.versionText}>WeVysya {getVersionLabel()}</Text>
+      <DevelopedByFooter />
       </ScrollView>
     </View>
   );

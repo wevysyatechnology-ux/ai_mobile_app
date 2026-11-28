@@ -24,6 +24,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/constants/theme';
 import { EventsService, EventMeeting } from '@/services/eventsService';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { format, isToday, isTomorrow, isPast } from 'date-fns';
 
 function formatEventDate(dateStr: string): string {
@@ -205,6 +206,7 @@ export default function EventDetail() {
             activeOpacity={0.8}>
             <Text style={styles.allEventsBtnText}>View All Events</Text>
           </TouchableOpacity>
+        <DevelopedByFooter />
         </ScrollView>
       )}
     </View>

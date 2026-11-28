@@ -21,6 +21,7 @@ interface AISuggestionItem {
 }
 
 import { formatLabel } from '@/utils/formatLabel';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 export default function Activity() {
   const { userId } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -460,6 +461,7 @@ export default function Activity() {
           aiSuggestions.length === 0 && (
           <AIEmptyState message="Want me to suggest people you should connect with?" />
         )}
+      <DevelopedByFooter />
       </ScrollView>
     </View>
   );

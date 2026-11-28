@@ -13,6 +13,7 @@ import SelfToggle from '@/components/shared/SelfToggle';
 import SuccessModal from '@/components/shared/SuccessModal';
 import ShareReceiptCard, { ReceiptData, receiptToText } from '@/components/shared/ShareReceiptCard';
 import { maskName, maskPhone } from '@/utils/mask';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { format } from 'date-fns';
 
 type ScopeMode = 'in' | 'out';
@@ -623,6 +624,7 @@ export default function LinksForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
+      <DevelopedByFooter />
       </ScrollView>
       <SuccessModal
         visible={!!success}

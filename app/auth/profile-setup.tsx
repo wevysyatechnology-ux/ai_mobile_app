@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { colors } from '@/constants/theme';
 
 import { keyboardDismissProps } from '@/hooks/useFormFields';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 export default function ProfileSetupScreen() {
   const router = useRouter();
   const { userId, profile, refreshProfile } = useAuth();
@@ -221,6 +222,7 @@ export default function ProfileSetupScreen() {
               </TouchableOpacity>
             </View>
           </View>
+        <DevelopedByFooter />
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>

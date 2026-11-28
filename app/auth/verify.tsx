@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ShieldCheck } from 'lucide-react-native';
 import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function VerifyScreen() {
   const router = useRouter();
@@ -103,6 +104,7 @@ export default function VerifyScreen() {
               )}
             </View>
           </View>
+          <DevelopedByFooter />
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>

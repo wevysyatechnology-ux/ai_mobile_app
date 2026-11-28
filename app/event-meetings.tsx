@@ -24,6 +24,7 @@ import {
 } from 'lucide-react-native';
 import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/constants/theme';
 import { EventsService, EventMeeting } from '@/services/eventsService';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { format, isToday, isTomorrow } from 'date-fns';
 
 type Tab = 'upcoming' | 'completed';
@@ -208,6 +209,7 @@ export default function EventMeetings() {
               />
             ))
           )}
+        <DevelopedByFooter />
         </ScrollView>
       )}
     </View>

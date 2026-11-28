@@ -19,6 +19,7 @@ import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
 
 import { keyboardDismissProps } from '@/hooks/useFormFields';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 export default function SignupScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -335,6 +336,7 @@ export default function SignupScreen() {
               </View>
             </Animated.View>
           </View>
+        <DevelopedByFooter />
         </ScrollView>
       </KeyboardAvoidingView>
     </LinearGradient>

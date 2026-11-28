@@ -18,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
 import { getVersionLabel } from '@/utils/appVersion';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -318,6 +319,7 @@ export default function LoginScreen() {
                 <Text style={styles.versionText}>{getVersionLabel()}</Text>
             </>
           </Animated.View>
+          <DevelopedByFooter />
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>

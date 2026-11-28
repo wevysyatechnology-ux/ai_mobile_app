@@ -11,6 +11,7 @@ import { LinksService } from '@/services/linksService';
 import type { User } from '@/types';
 
 import { keyboardDismissProps } from '@/hooks/useFormFields';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 export default function Discover() {
   const { profile } = useAuth();
   const params = useLocalSearchParams<{ q?: string; category?: string; city?: string; keyword?: string }>();
@@ -225,6 +226,7 @@ export default function Discover() {
         />
         </>
         )}
+      <DevelopedByFooter />
       </ScrollView>
     </View>
   );

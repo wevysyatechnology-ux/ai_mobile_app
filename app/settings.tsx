@@ -13,6 +13,7 @@ import { ShieldCheck, ChevronLeft, Info } from 'lucide-react-native';
 import { colors, spacing } from '@/constants/theme';
 import { getVersionLabel } from '@/utils/appVersion';
 import { useAIConsent } from '@/contexts/AIConsentContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function Settings() {
   const { consentStatus, isConsentGranted, grantConsent, denyConsent } = useAIConsent();
@@ -180,6 +181,7 @@ export default function Settings() {
           used for AI features.
         </Text>
         <Text style={styles.versionText}>WeVysya {getVersionLabel()}</Text>
+      <DevelopedByFooter />
       </ScrollView>
     </View>
   );

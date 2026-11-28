@@ -18,6 +18,7 @@ import { I2WeService } from '@/services/i2weService';
 import MemberPicker, { PickedMember } from '@/components/shared/MemberPicker';
 import { sendI2WeMeetingRecordedNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function I2WeForm() {
   const { profile } = useAuth();
@@ -214,6 +215,7 @@ export default function I2WeForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Save Meeting</Text>
         </TouchableOpacity>
+      <DevelopedByFooter />
       </ScrollView>
       {toolbar}
     </View>

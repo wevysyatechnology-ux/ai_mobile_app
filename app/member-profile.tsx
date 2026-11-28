@@ -6,6 +6,7 @@ import { colors, spacing } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConnectionsService, ConnectionSummary } from '@/services/connectionsService';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 interface HouseDetails {
   name: string;
@@ -248,6 +249,7 @@ export default function MemberProfileScreen() {
             </View>
           )}
         </View>
+        <DevelopedByFooter />
       </View>
     </View>
   );

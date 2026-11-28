@@ -10,6 +10,7 @@ import { useFormFields, keyboardDismissProps } from '@/hooks/useFormFields';
 import MemberPicker, { PickedMember } from '@/components/shared/MemberPicker';
 import SuccessModal from '@/components/shared/SuccessModal';
 import ShareReceiptCard, { ReceiptData, receiptToText } from '@/components/shared/ShareReceiptCard';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { format } from 'date-fns';
 
 export default function DealsForm() {
@@ -159,6 +160,7 @@ export default function DealsForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Create Deal</Text>
         </TouchableOpacity>
+      <DevelopedByFooter />
       </ScrollView>
       <SuccessModal
         visible={!!success}

@@ -1,498 +1,369 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Easing, Image, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Easing,
+  Image,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '@/constants/theme';
+import { ArrowRight } from 'lucide-react-native';
 
-const { height } = Dimensions.get('window');
+interface Props {
+  onEnter?: () => void;
+}
 
-export default function StartupLoadingView() {
-  const iconScale = useRef(new Animated.Value(0)).current;
-  const iconRotate = useRef(new Animated.Value(0)).current;
-  const iconOpacity = useRef(new Animated.Value(0)).current;
-
-  const innerGlow = useRef(new Animated.Value(0)).current;
-  const middleGlow = useRef(new Animated.Value(0)).current;
-  const outerGlow = useRef(new Animated.Value(0)).current;
-
-  const ring1Scale = useRef(new Animated.Value(1)).current;
-  const ring2Scale = useRef(new Animated.Value(1)).current;
-  const ring3Scale = useRef(new Animated.Value(1)).current;
-
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const textSlide = useRef(new Animated.Value(30)).current;
+/**
+ * Opening/welcome screen — static composition with a tap-to-enter CTA.
+ * Replaces the old auto-advancing loading spinner.
+ */
+export default function StartupLoadingView({ onEnter }: Props) {
+  const haloPulse = useRef(new Animated.Value(0)).current;
+  const orbitRotate = useRef(new Animated.Value(0)).current;
+  const fadeIn = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.spring(iconScale, {
-          toValue: 1,
-          tension: 50,
-          friction: 10,
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconOpacity, {
-          toValue: 1,
-          duration: 600,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconRotate, {
-          toValue: 1,
-          duration: 800,
-          easing: Easing.out(Easing.back(1.2)),
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.delay(200),
-      Animated.parallel([
-        Animated.timing(textOpacity, {
-          toValue: 1,
-          duration: 600,
-          easing: Easing.ease,
-          useNativeDriver: true,
-        }),
-        Animated.timing(textSlide, {
-          toValue: 0,
-          duration: 600,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
+    Animated.timing(fadeIn, {
+      toValue: 1,
+      duration: 600,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
 
-    const innerGlowAnimation = Animated.loop(
+    const halo = Animated.loop(
       Animated.sequence([
-        Animated.timing(innerGlow, {
+        Animated.timing(haloPulse, {
           toValue: 1,
-          duration: 1500,
+          duration: 2250,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-        Animated.timing(innerGlow, {
+        Animated.timing(haloPulse, {
           toValue: 0,
-          duration: 1500,
+          duration: 2250,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
       ])
     );
 
-    const middleGlowAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.delay(300),
-        Animated.timing(middleGlow, {
-          toValue: 1,
-          duration: 1800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(middleGlow, {
-          toValue: 0,
-          duration: 1800,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
+    const orbit = Animated.loop(
+      Animated.timing(orbitRotate, {
+        toValue: 1,
+        duration: 28000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
     );
 
-    const outerGlowAnimation = Animated.loop(
-      Animated.sequence([
-        Animated.delay(600),
-        Animated.timing(outerGlow, {
-          toValue: 1,
-          duration: 2000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(outerGlow, {
-          toValue: 0,
-          duration: 2000,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
-    const ringAnimation = Animated.loop(
-      Animated.parallel([
-        Animated.sequence([
-          Animated.timing(ring1Scale, {
-            toValue: 1.4,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(ring1Scale, {
-            toValue: 1,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.sequence([
-          Animated.delay(1000),
-          Animated.timing(ring2Scale, {
-            toValue: 1.5,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(ring2Scale, {
-            toValue: 1,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-        Animated.sequence([
-          Animated.delay(2000),
-          Animated.timing(ring3Scale, {
-            toValue: 1.6,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-          Animated.timing(ring3Scale, {
-            toValue: 1,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: true,
-          }),
-        ]),
-      ])
-    );
-
-    innerGlowAnimation.start();
-    middleGlowAnimation.start();
-    outerGlowAnimation.start();
-    ringAnimation.start();
+    halo.start();
+    orbit.start();
 
     return () => {
-      innerGlowAnimation.stop();
-      middleGlowAnimation.stop();
-      outerGlowAnimation.stop();
-      ringAnimation.stop();
+      halo.stop();
+      orbit.stop();
     };
-  }, [iconOpacity, iconRotate, iconScale, innerGlow, middleGlow, outerGlow, ring1Scale, ring2Scale, ring3Scale, textOpacity, textSlide]);
+  }, [fadeIn, haloPulse, orbitRotate]);
 
-  const iconRotateInterpolate = iconRotate.interpolate({
+  const haloScale = haloPulse.interpolate({
     inputRange: [0, 1],
-    outputRange: ['-10deg', '0deg'],
+    outputRange: [1, 1.04],
   });
-
-  const innerGlowOpacity = innerGlow.interpolate({
+  const haloOpacity = haloPulse.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.4, 0.8],
+    outputRange: [0.78, 1],
   });
-
-  const middleGlowOpacity = middleGlow.interpolate({
+  const rotate = orbitRotate.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.3, 0.6],
-  });
-
-  const outerGlowOpacity = outerGlow.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.2, 0.5],
-  });
-
-  const ring1Opacity = ring1Scale.interpolate({
-    inputRange: [1, 1.6],
-    outputRange: [0.3, 0],
-  });
-
-  const ring2Opacity = ring2Scale.interpolate({
-    inputRange: [1, 1.6],
-    outputRange: [0.25, 0],
-  });
-
-  const ring3Opacity = ring3Scale.interpolate({
-    inputRange: [1, 1.6],
-    outputRange: [0.2, 0],
+    outputRange: ['0deg', '360deg'],
   });
 
   return (
-    <View style={styles.container}>
+    <View style={styles.root}>
+      {/* Radial ambient background */}
       <LinearGradient
-        colors={['#000000', '#0B1F14', '#000000']}
-        style={styles.gradient}
-        locations={[0, 0.5, 1]}
+        colors={['rgba(52,211,153,0.18)', 'rgba(13,57,52,0.45)', '#14231F']}
+        locations={[0, 0.45, 0.85]}
+        style={StyleSheet.absoluteFillObject}
       />
 
-      <View style={styles.content}>
-        <Animated.View
-          style={[
-            styles.ring,
-            {
-              width: 400,
-              height: 400,
-              borderRadius: 200,
-              opacity: ring3Opacity,
-              transform: [{ scale: ring3Scale }],
-            },
-          ]}
-        />
-        <Animated.View
-          style={[
-            styles.ring,
-            {
-              width: 350,
-              height: 350,
-              borderRadius: 175,
-              opacity: ring2Opacity,
-              transform: [{ scale: ring2Scale }],
-            },
-          ]}
-        />
-        <Animated.View
-          style={[
-            styles.ring,
-            {
-              width: 300,
-              height: 300,
-              borderRadius: 150,
-              opacity: ring1Opacity,
-              transform: [{ scale: ring1Scale }],
-            },
-          ]}
-        />
+      <SafeAreaView style={styles.safeArea}>
+        <Animated.View style={[styles.container, { opacity: fadeIn }]}>
+          {/* Top edition label */}
+          <View style={styles.header}>
+            <Text style={styles.editionLabel}>WEVYSYA · AI PLATFORM</Text>
+          </View>
 
-        <Animated.View
-          style={[
-            styles.glowLayer,
-            {
-              width: 260,
-              height: 260,
-              borderRadius: 130,
-              opacity: outerGlowOpacity,
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={['rgba(52, 211, 153, 0.3)', 'rgba(16, 185, 129, 0.15)', 'transparent']}
-            style={styles.gradientCircle}
-          />
-        </Animated.View>
+          {/* Emblem: orbital rings + medallion + logo */}
+          <View style={styles.emblemBlock}>
+            <View style={styles.emblem}>
+              {/* Outer halo ring (pulsing) */}
+              <Animated.View
+                style={[
+                  styles.haloRing,
+                  { opacity: haloOpacity, transform: [{ scale: haloScale }] },
+                ]}
+              />
+              {/* Middle dashed ring with orbiting dots */}
+              <Animated.View style={[styles.orbitRing, { transform: [{ rotate }] }]}>
+                <View style={[styles.orbitDot, styles.orbitDotTop]} />
+                <View style={[styles.orbitDot, styles.orbitDotBottom]} />
+              </Animated.View>
+              {/* Inner medallion */}
+              <View style={styles.medallionShadow}>
+                <LinearGradient
+                  colors={['rgba(13,57,52,0.88)', 'rgba(20,35,31,0.96)']}
+                  style={styles.medallion}
+                >
+                  <Image
+                    source={require('@/assets/images/wevysya_logo_r.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                  />
+                </LinearGradient>
+              </View>
+            </View>
 
-        <Animated.View
-          style={[
-            styles.glowLayer,
-            {
-              width: 220,
-              height: 220,
-              borderRadius: 110,
-              opacity: middleGlowOpacity,
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={['rgba(52, 211, 153, 0.4)', 'rgba(16, 185, 129, 0.2)', 'transparent']}
-            style={styles.gradientCircle}
-          />
-        </Animated.View>
+            {/* Wordmark + divider + tagline */}
+            <View style={styles.wordmarkBlock}>
+              <Text style={styles.wordmark}>WE VYSYA</Text>
+              <LinearGradient
+                colors={['#045C00', '#34D399', '#045C00']}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.wordmarkDivider}
+              />
+              <Text style={styles.tagline}>Stop Thinking I, Start Thinking We!</Text>
+            </View>
+          </View>
 
-        <Animated.View
-          style={[
-            styles.glowLayer,
-            {
-              width: 180,
-              height: 180,
-              borderRadius: 90,
-              opacity: innerGlowOpacity,
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={['rgba(52, 211, 153, 0.5)', 'rgba(16, 185, 129, 0.3)', 'transparent']}
-            style={styles.gradientCircle}
-          />
-        </Animated.View>
+          {/* Bottom glass launch card */}
+          <View style={styles.footer}>
+            <View style={styles.launchCard}>
+              <Text style={styles.cardCopy}>
+                Your entrepreneurial network, events, and links in one intelligent space.
+              </Text>
 
-        <Animated.View
-          style={[
-            styles.iconContainer,
-            {
-              opacity: iconOpacity,
-              transform: [{ scale: iconScale }, { rotate: iconRotateInterpolate }],
-            },
-          ]}
-        >
-          <LinearGradient
-            colors={['rgba(15, 50, 35, 1)', 'rgba(10, 35, 25, 1)']}
-            style={styles.iconBackground}
-          >
-            <Image
-              source={require('@/assets/images/wevysya_logo_r.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </LinearGradient>
-        </Animated.View>
+              <Pressable
+                onPress={onEnter}
+                style={({ pressed }) => [
+                  styles.ctaWrapper,
+                  pressed && styles.ctaPressed,
+                ]}
+              >
+                <LinearGradient
+                  colors={['#045C00', '#0D3934', '#317559']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.cta}
+                >
+                  <Text style={styles.ctaText}>Enter WeVysya</Text>
+                  <ArrowRight size={16} color="#FFFFFF" strokeWidth={2.2} />
+                </LinearGradient>
+              </Pressable>
 
-        <Animated.View
-          style={[
-            styles.textContainer,
-            {
-              opacity: textOpacity,
-              transform: [{ translateY: textSlide }],
-            },
-          ]}
-        >
-          <Animated.Text style={styles.brandText}>WeVysya</Animated.Text>
-          <LoadingDots />
+              <Text style={styles.website}>www.wevysya.com</Text>
+            </View>
+          </View>
         </Animated.View>
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
 
-function LoadingDots() {
-  const dot1 = useRef(new Animated.Value(0)).current;
-  const dot2 = useRef(new Animated.Value(0)).current;
-  const dot3 = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const animateDot = (dot: Animated.Value, delay: number) => {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.delay(delay),
-          Animated.timing(dot, {
-            toValue: 1,
-            duration: 400,
-            easing: Easing.ease,
-            useNativeDriver: true,
-          }),
-          Animated.timing(dot, {
-            toValue: 0,
-            duration: 400,
-            easing: Easing.ease,
-            useNativeDriver: true,
-          }),
-        ])
-      );
-
-      animation.start();
-      return animation;
-    };
-
-    const dot1Animation = animateDot(dot1, 0);
-    const dot2Animation = animateDot(dot2, 150);
-    const dot3Animation = animateDot(dot3, 300);
-
-    return () => {
-      dot1Animation.stop();
-      dot2Animation.stop();
-      dot3Animation.stop();
-    };
-  }, [dot1, dot2, dot3]);
-
-  const createDotStyle = (dot: Animated.Value) => ({
-    opacity: dot.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.3, 1],
-    }),
-    transform: [
-      {
-        translateY: dot.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, -8],
-        }),
-      },
-    ],
-  });
-
-  return (
-    <View style={styles.dots}>
-      <Animated.View style={[styles.dot, createDotStyle(dot1)]} />
-      <Animated.View style={[styles.dot, createDotStyle(dot2)]} />
-      <Animated.View style={[styles.dot, createDotStyle(dot3)]} />
-    </View>
-  );
-}
+const EMBLEM_SIZE = 316;
+const MEDALLION_SIZE = 184;
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#14231F',
+  },
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+  header: {
+    alignItems: 'center',
+    paddingTop: 8,
   },
-  content: {
+  editionLabel: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 12,
+    letterSpacing: 2.5,
+    color: '#34D399',
+    textTransform: 'uppercase',
+  },
+  emblemBlock: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    gap: 32,
   },
-  ring: {
+  emblem: {
+    width: EMBLEM_SIZE,
+    height: EMBLEM_SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  haloRing: {
     position: 'absolute',
-    borderWidth: 1.5,
-    borderColor: colors.accent_green_bright,
-  },
-  glowLayer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gradientCircle: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 1000,
-  },
-  iconContainer: {
-    width: 160,
-    height: 160,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  iconBackground: {
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: colors.accent_green_bright,
+    width: EMBLEM_SIZE,
+    height: EMBLEM_SIZE,
+    borderRadius: EMBLEM_SIZE / 2,
+    borderWidth: 1,
+    borderColor: 'rgba(49,117,89,0.4)',
+    shadowColor: '#34D399',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 30,
-    elevation: 20,
+    shadowOpacity: 0.3,
+    shadowRadius: 22,
+    elevation: 8,
   },
-  logo: {
-    width: 110,
-    height: 110,
-  },
-  textContainer: {
+  orbitRing: {
     position: 'absolute',
-    bottom: height * 0.15,
-    alignItems: 'center',
+    width: EMBLEM_SIZE - 44,
+    height: EMBLEM_SIZE - 44,
+    borderRadius: (EMBLEM_SIZE - 44) / 2,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(52,211,153,0.28)',
   },
-  brandText: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: colors.text_primary,
-    letterSpacing: 2,
-    marginBottom: 24,
-    textShadowColor: 'rgba(52, 211, 153, 0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
+  orbitDot: {
+    position: 'absolute',
+    borderRadius: 999,
   },
-  dots: {
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
+  orbitDotTop: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#34D399',
+    top: -6,
+    left: '50%',
+    marginLeft: -6,
+    shadowColor: '#34D399',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  dot: {
+  orbitDotBottom: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.accent_green_bright,
-    shadowColor: colors.accent_green_bright,
+    backgroundColor: '#317559',
+    bottom: -4,
+    left: '50%',
+    marginLeft: -4,
+  },
+  medallionShadow: {
+    shadowColor: '#34D399',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
+    shadowOpacity: 0.55,
+    shadowRadius: 32,
+    elevation: 12,
+  },
+  medallion: {
+    width: MEDALLION_SIZE,
+    height: MEDALLION_SIZE,
+    borderRadius: MEDALLION_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(52,211,153,0.55)',
+  },
+  logo: {
+    width: 128,
+    height: 128,
+  },
+  wordmarkBlock: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  wordmark: {
+    fontFamily: 'Poppins-Bold',
+    fontSize: 28,
+    letterSpacing: 6,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  wordmarkDivider: {
+    width: 64,
+    height: 4,
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  tagline: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 18,
+    lineHeight: 26,
+    color: '#34D399',
+    textAlign: 'center',
+    marginTop: 8,
+    paddingHorizontal: 12,
+  },
+  footer: {
+    paddingTop: 8,
+  },
+  launchCard: {
+    backgroundColor: 'rgba(13,57,52,0.75)',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(49,117,89,0.6)',
+    padding: 24,
+    gap: 16,
+    alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 24 },
+    shadowOpacity: 0.4,
+    shadowRadius: 36,
+    elevation: 8,
+  },
+  cardCopy: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  ctaWrapper: {
+    width: '100%',
+    borderRadius: 999,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#34D399',
+    shadowColor: '#34D399',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+  ctaPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  ctaText: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    letterSpacing: 0.3,
+    color: '#FFFFFF',
+  },
+  website: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 12,
+    color: '#34D399',
   },
 });

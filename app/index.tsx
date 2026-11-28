@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import StartupLoadingView from '@/components/shared/StartupLoadingView';
@@ -6,32 +6,32 @@ import StartupLoadingView from '@/components/shared/StartupLoadingView';
 export default function Index() {
   const router = useRouter();
   const { isAuthenticated, isProfileComplete, isLoading } = useAuth();
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const [routing, setRouting] = useState(false);
 
-  useEffect(() => {
-    const minDisplayTimer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, 2500);
+  const goToNextScreen = useCallback(() => {
+    if (routing) return;
+    setRouting(true);
 
-    return () => clearTimeout(minDisplayTimer);
-  }, []);
-
-  useEffect(() => {
-    console.log('Index screen - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'isProfileComplete:', isProfileComplete, 'minTimeElapsed:', minTimeElapsed);
-
-    if (!isLoading && minTimeElapsed) {
-      if (!isAuthenticated) {
-        console.log('Redirecting to login');
-        router.replace('/auth/login');
-      } else if (!isProfileComplete) {
-        console.log('Redirecting to profile setup');
-        router.replace('/auth/profile-setup');
-      } else {
-        console.log('Redirecting to tabs');
-        router.replace('/(tabs)');
-      }
+    if (isLoading) {
+      // Auth still resolving — wait briefly and retry
+      setTimeout(() => setRouting(false), 200);
+      return;
     }
-  }, [isAuthenticated, isProfileComplete, isLoading, minTimeElapsed]);
 
-  return <StartupLoadingView />;
+    if (!isAuthenticated) {
+      router.replace('/auth/login');
+    } else if (!isProfileComplete) {
+      router.replace('/auth/profile-setup');
+    } else {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, isLoading, isProfileComplete, router, routing]);
+
+  useEffect(() => {
+    if (routing && !isLoading) {
+      goToNextScreen();
+    }
+  }, [routing, isLoading, goToNextScreen]);
+
+  return <StartupLoadingView onEnter={goToNextScreen} />;
 }

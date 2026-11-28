@@ -32,7 +32,7 @@ export default function GlobalVoiceControl() {
         };
     }, [pathname]);
 
-    if (isLoading || !isAuthenticated || pathname === '/auth/login') {
+    if (isLoading || !isAuthenticated || pathname === '/auth/login' || pathname === '/') {
         return null;
     }
 

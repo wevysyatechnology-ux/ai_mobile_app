@@ -25,6 +25,7 @@ import {
 import { colors, spacing, borderRadius, fontSize, fontFamily } from '@/constants/theme';
 import { EventsService, EventMeeting } from '@/services/eventsService';
 import { format, isToday, isTomorrow } from 'date-fns';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 type Tab = 'upcoming' | 'completed';
 
@@ -208,6 +209,7 @@ export default function EventMeetings() {
               />
             ))
           )}
+          <DevelopedByFooter />
         </ScrollView>
       )}
     </View>

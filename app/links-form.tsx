@@ -7,6 +7,7 @@ import { LinksService } from '@/services/linksService';
 import { UserProfile } from '@/types/database';
 import { sendLinkReceivedNotification, sendLinkSentNotification } from '@/utils/notificationHelpers';
 import { useAuth } from '@/contexts/AuthContext';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function LinksForm() {
   const { profile } = useAuth();
@@ -301,6 +302,7 @@ export default function LinksForm() {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

@@ -22,6 +22,7 @@ import { actionEngine } from '@/services/actionEngine';
 import { knowledgeService } from '@/services/knowledgeService';
 import { ActivityService } from '@/services/activityService';
 import ActivityFeedItem from '@/components/activity/ActivityFeedItem';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { Activity } from '@/types';
 
 export default function Home() {
@@ -274,6 +275,8 @@ export default function Home() {
           <Text style={styles.discoverButtonText}>Explore All Channels</Text>
           <ChevronRight size={20} color={colors.accent_green_bright} />
         </TouchableOpacity>
+
+        <DevelopedByFooter />
 
       </ScrollView>
     </View >

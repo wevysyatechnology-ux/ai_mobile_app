@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authService } from '@/services/authService';
 import { colors } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -301,6 +302,7 @@ export default function LoginScreen() {
                 </View>
             </>
           </Animated.View>
+          <DevelopedByFooter />
         </View>
       </KeyboardAvoidingView>
     </LinearGradient>

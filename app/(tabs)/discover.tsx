@@ -5,6 +5,7 @@ import { Link, Handshake, Users, Grid, CalendarClock } from 'lucide-react-native
 import { colors, spacing } from '@/constants/theme';
 import DiscoverSection from '@/components/discover/DiscoverSection';
 import FloatingLogo from '@/components/shared/FloatingLogo';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 import { useAuth } from '@/contexts/AuthContext';
 import { LinksService } from '@/services/linksService';
 import type { User } from '@/types';
@@ -148,6 +149,7 @@ export default function Discover() {
           members={houseMembers}
           isLoading={membersLoading}
         />
+        <DevelopedByFooter />
       </ScrollView>
     </View>
   );

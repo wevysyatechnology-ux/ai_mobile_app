@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowRight } from 'lucide-react-native';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
 
 interface Props {
   onEnter?: () => void;
@@ -167,6 +168,7 @@ export default function StartupLoadingView({ onEnter }: Props) {
 
               <Text style={styles.website}>www.wevysya.com</Text>
             </View>
+            <DevelopedByFooter prominent />
           </View>
         </Animated.View>
       </SafeAreaView>

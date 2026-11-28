@@ -1,90 +1,99 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
-import StartupLoadingView from '@/components/shared/StartupLoadingView';
 import { Platform } from 'react-native';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import StartupLoadingView from '@/components/shared/StartupLoadingView';
 
 export default function Index() {
   const router = useRouter();
   const { isAuthenticated, isProfileComplete, isLoading } = useAuth();
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [isRecovery, setIsRecovery] = useState(false);
+  const [routing, setRouting] = useState(false);
 
+  // On web, detect Supabase auth redirects in the URL hash fragment
+  // (e.g. recovery / reset password) — preserved from Sumit's 2.5.1.
   useEffect(() => {
-    // On web, detect Supabase auth redirects in the URL hash fragment (e.g. recovery / reset password)
-    if (Platform.OS === 'web') {
-      const hash = window.location.hash;
-      if (hash) {
-        const hashStr = hash.substring(1);
-        const params = new URLSearchParams(hashStr);
-        
-        // 1. Detect if there is a redirection error (like otp_expired)
-        const error = params.get('error');
-        const errorDescription = params.get('error_description');
-        if (error) {
-          console.log('🔴 Hash contains auth error redirect:', error, errorDescription);
-          setIsRecovery(true);
-          router.replace({
-            pathname: '/auth/reset-password',
-            params: { error, error_description: errorDescription },
-          });
-          return;
-        }
+    if (Platform.OS !== 'web') return;
+    const hash = window.location.hash;
+    if (!hash) return;
 
-        // 2. Detect recovery tokens
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token');
-        const type = params.get('type');
-        
-        if (accessToken && refreshToken && type === 'recovery') {
-          console.log('🔄 Hash contains recovery session. Setting session...');
-          setIsRecovery(true);
-          supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          }).then(({ data, error: sessionError }) => {
-            if (!sessionError) {
-              console.log('✅ Recovery session set successfully, routing to reset-password');
-              router.replace('/auth/reset-password');
-            } else {
-              console.error('❌ Failed to set recovery session from hash:', sessionError);
-              setIsRecovery(false);
-            }
-          });
-        }
-      }
-    }
-  }, []);
+    const hashStr = hash.substring(1);
+    const params = new URLSearchParams(hashStr);
 
-  useEffect(() => {
-    const minDisplayTimer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, 2500);
-
-    return () => clearTimeout(minDisplayTimer);
-  }, []);
-
-  useEffect(() => {
-    console.log('Index screen - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'isProfileComplete:', isProfileComplete, 'minTimeElapsed:', minTimeElapsed, 'isRecovery:', isRecovery);
-
-    if (isRecovery) {
-      return; // Do not perform standard redirects if we are processing a recovery hash
+    const error = params.get('error');
+    const errorDescription = params.get('error_description');
+    if (error) {
+      console.log('🔴 Hash contains auth error redirect:', error, errorDescription);
+      setIsRecovery(true);
+      router.replace({
+        pathname: '/auth/reset-password',
+        params: { error, error_description: errorDescription },
+      });
+      return;
     }
 
-    if (!isLoading && minTimeElapsed) {
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+    const type = params.get('type');
+
+    if (accessToken && refreshToken && type === 'recovery') {
+      console.log('🔄 Hash contains recovery session. Setting session...');
+      setIsRecovery(true);
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(({ error: sessionError }) => {
+          if (!sessionError) {
+            console.log('✅ Recovery session set, routing to reset-password');
+            router.replace('/auth/reset-password');
+          } else {
+            console.error('❌ Failed to set recovery session:', sessionError);
+            setIsRecovery(false);
+          }
+        });
+    }
+  }, [router]);
+
+  const goToNextScreen = useCallback(() => {
+    if (routing || isRecovery) return;
+
+    if (isLoading) {
+      // Auth still resolving — mark routing intent and let effect retry
+      setRouting(true);
+      return;
+    }
+
+    setRouting(true);
+
+    if (!isAuthenticated) {
+      router.replace('/auth/login');
+    } else if (!isProfileComplete) {
+      router.replace('/auth/profile-setup');
+    } else {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, isLoading, isProfileComplete, isRecovery, router, routing]);
+
+  // If user tapped Enter while auth was loading, retry when it resolves
+  useEffect(() => {
+    if (routing && !isLoading && !isRecovery) {
       if (!isAuthenticated) {
-        console.log('Redirecting to login');
         router.replace('/auth/login');
       } else if (!isProfileComplete) {
-        console.log('Redirecting to profile setup');
         router.replace('/auth/profile-setup');
       } else {
-        console.log('Redirecting to tabs');
         router.replace('/(tabs)');
       }
     }
-  }, [isAuthenticated, isProfileComplete, isLoading, minTimeElapsed, isRecovery]);
+  }, [routing, isLoading, isAuthenticated, isProfileComplete, isRecovery, router]);
 
-  return <StartupLoadingView />;
+  // Safety fallback: auto-advance after 30s if the user never taps Enter
+  useEffect(() => {
+    const fallback = setTimeout(() => {
+      goToNextScreen();
+    }, 30000);
+    return () => clearTimeout(fallback);
+  }, [goToNextScreen]);
+
+  return <StartupLoadingView onEnter={goToNextScreen} />;
 }

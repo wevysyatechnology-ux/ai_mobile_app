@@ -28,7 +28,7 @@ This creates:
 - `core_house_members` - House membership mappings
 - `core_links` - Business connections
 - `core_deals` - Deal tracking
-- `core_i2we` - One-on-one meetings
+- `core_i2we` - i2We meetings
 
 #### Migration 2: Create Channels System
 **File:** `supabase/migrations/20251221095256_create_channels_table.sql`
@@ -38,7 +38,7 @@ This creates:
 - `channel_posts` - Posts within channels
 
 And populates default channels:
-- 12we Meetings
+- i2We Meetings
 - Links
 - Visitors
 - Jobs
@@ -86,7 +86,7 @@ This updates:
 
 - **deal_participants**: Track who joins deals
 
-- **core_i2we**: One-on-one meetings (house-restricted)
+- **core_i2we**: i2We meetings (house-restricted)
 
 ### Social Features
 - **channels**: Discussion channels by category
@@ -97,7 +97,7 @@ This updates:
 All tables have RLS enabled with policies that:
 - Users can only access their own profile data
 - House members can only see their house's data
-- Links and I2WE meetings restricted to same-house members
+- Links and i2We meetings restricted to same-house members
 - WeVysya deals visible to all, house deals restricted
 - Proper authentication checks on all operations
 

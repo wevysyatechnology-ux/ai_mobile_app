@@ -38,8 +38,8 @@ The AI can understand and respond to:
 - "Introduce someone"
 - "New introduction"
 
-#### i2we Connection
-- "i2we"
+#### i2We Connection
+- "i2We"
 - "Connect people"
 - "Stop thinking I"
 
@@ -198,7 +198,7 @@ Try these commands:
 - "Show my profile" → Opens profile page
 - "What can you do?" → Help message
 - "Post a deal" → Opens deals form
-- "i2we" → Opens i2we form
+- "i2We" → Opens i2We form
 
 ## Mobile Integration
 

@@ -125,7 +125,7 @@ USING (
   )
 );
 
--- Core I2WE - users can see their meetings
+-- Core i2We - users can see their meetings
 CREATE POLICY "Allow users to view their meetings"
 ON core_i2we FOR SELECT
 USING (auth.uid() = member_1_id OR auth.uid() = member_2_id);

@@ -50,7 +50,7 @@ export interface DealRecordedPayload extends BaseNotificationPayload {
   };
 }
 
-export interface I2WEMeetingScheduledPayload extends BaseNotificationPayload {
+export interface I2WeMeetingScheduledPayload extends BaseNotificationPayload {
   type: 'i2we_meeting_scheduled';
   data: {
     meetingId: string;
@@ -131,7 +131,7 @@ export interface ApplicationApprovedPayload extends BaseNotificationPayload {
 export type NotificationPayload =
   | LinkReceivedPayload
   | DealRecordedPayload
-  | I2WEMeetingScheduledPayload
+  | I2WeMeetingScheduledPayload
   | MeetingReminderPayload
   | AttendanceMarkedPayload
   | AIMatchSuggestionPayload
@@ -194,7 +194,7 @@ export const NotificationTemplates: Record<
     body: `${data.memberName} has recorded a deal with you worth ${data.currency}${data.amount.toLocaleString()}.`,
   }),
   i2we_meeting_scheduled: (data) => ({
-    title: '📅 I2WE Meeting Scheduled',
+    title: '📅 i2We Meeting Scheduled',
     body: `${data.schedulerName} has scheduled a 1-on-1 meeting with you on ${data.meetingDate}.`,
   }),
   meeting_reminder: (data) => ({

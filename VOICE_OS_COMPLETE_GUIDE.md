@@ -302,9 +302,9 @@ testVoiceOS();
 - "Connect two members"
 - "Introduce someone"
 
-### I2WE Actions:
-- "Create an i2we meeting"
-- "Schedule a one-on-one"
+### i2We Actions:
+- "Create an i2We meeting"
+- "Schedule an i2We meeting"
 - "Request a meeting"
 
 ### Profile & Navigation:

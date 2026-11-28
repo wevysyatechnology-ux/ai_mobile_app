@@ -96,7 +96,7 @@ Available actions:
 - post_deal: Create a new business deal
 - view_deals: Browse available deals
 - send_link: Send a link request
-- create_i2we: Create an i2we connection
+- create_i2we: Create an i2We connection
 - view_profile: View user profile
 - view_channels: Browse channels
 - view_activity: View recent activity

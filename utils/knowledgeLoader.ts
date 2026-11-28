@@ -50,7 +50,7 @@ Examples include Hyderabad House, Bangalore House, Mumbai House, Delhi House, an
   {
     content: `WeVysya membership is open to professionals, entrepreneurs, and individuals committed to collective growth.
 Members can be from any industry: Chartered Accountants, Lawyers, Doctors, Engineers, Entrepreneurs, and more.
-Membership provides access to the network, resources, deals, events, and the i2we connection system.
+Membership provides access to the network, resources, deals, events, and the i2We connection system.
 Members are expected to contribute to the community through deals, links, knowledge sharing, and active participation.`,
     metadata: {
       title: 'WeVysya Membership',
@@ -59,14 +59,14 @@ Members are expected to contribute to the community through deals, links, knowle
     },
   },
 
-  // i2we System
+  // i2We System
   {
-    content: `i2we (I to WE) is WeVysya's unique connection system that transforms individual needs into collective opportunities.
-When a member has a need or opportunity, they post an i2we request. The community then works together to fulfill it.
-i2we embodies the core principle: your problem becomes our opportunity, and our collective strength solves individual challenges.
+    content: `i2We (I to WE) is WeVysya's unique connection system that transforms individual needs into collective opportunities.
+When a member has a need or opportunity, they post an i2We request. The community then works together to fulfill it.
+i2We embodies the core principle: your problem becomes our opportunity, and our collective strength solves individual challenges.
 This system has created countless business connections, partnerships, and opportunities within the network.`,
     metadata: {
-      title: 'i2we Connection System',
+      title: 'i2We Connection System',
       category: 'features',
       source: 'core_knowledge',
     },
@@ -149,7 +149,7 @@ The platform is designed to make collaboration effortless.`,
 - Find members: "Find a CA in Bangalore" or "Find lawyers in Mumbai"
 - Post deals: "Post a new deal" or "Create a business opportunity"
 - Send links: "Send a link request" or "Introduce two members"
-- Create i2we: "Create an i2we connection" or "I need help with..."
+- Create i2We: "Create an i2We connection" or "I need help with..."
 - View channels: "Show all channels" or "Browse communities"
 - View activity: "Show recent activity" or "What's happening"
 - Answer questions: Ask anything about WeVysya, houses, events, or members

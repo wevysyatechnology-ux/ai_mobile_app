@@ -55,11 +55,11 @@ export default function ChannelsScreen() {
     (channel.name || '').toLowerCase().includes('visitor');
 
   const priorityChannels = channels.filter(c =>
-    ['links', 'deals', '12we-meetings'].includes(c.slug)
+    ['links', 'deals', 'i2we-meetings'].includes(c.slug)
   );
 
   const otherChannels = channels.filter(c =>
-    !['links', 'deals', '12we-meetings'].includes(c.slug)
+    !['links', 'deals', 'i2we-meetings'].includes(c.slug)
   );
 
   const categories = ['All', ...new Set(channels.map((c) => c.category))];

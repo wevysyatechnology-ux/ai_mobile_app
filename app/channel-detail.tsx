@@ -15,10 +15,10 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, Plus } from 'lucide-react-native';
 import { channelsService } from '@/services/channelsService';
 import { DealsService } from '@/services/dealsService';
-import { I2WEService } from '@/services/i2weService';
+import { I2WeService } from '@/services/i2weService';
 import { LinksService } from '@/services/linksService';
 import { EventsService, EventMeeting } from '@/services/eventsService';
-import { Channel, ChannelPost, CoreDeal, CoreI2WE, CoreLink } from '@/types/database';
+import { Channel, ChannelPost, CoreDeal, CoreI2We, CoreLink } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
@@ -31,7 +31,7 @@ export default function ChannelDetailScreen() {
   const [posts, setPosts] = useState<ChannelPost[]>([]);
   const [links, setLinks] = useState<CoreLink[]>([]);
   const [deals, setDeals] = useState<CoreDeal[]>([]);
-  const [meetings, setMeetings] = useState<CoreI2WE[]>([]);
+  const [meetings, setMeetings] = useState<CoreI2We[]>([]);
   const [events, setEvents] = useState<EventMeeting[]>([]);
   const [eventsTab, setEventsTab] = useState<'upcoming' | 'completed'>('upcoming');
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,7 @@ export default function ChannelDetailScreen() {
     if (normalizedSlug.includes('link')) return 'links';
     if (normalizedSlug.includes('deal')) return 'deals';
     if (
-      normalizedSlug.includes('i2we') ||
+      normalizedSlug.includes('i2We') ||
       normalizedSlug.includes('12we') ||
       normalizedSlug.includes('meeting')
     ) {
@@ -99,7 +99,7 @@ export default function ChannelDetailScreen() {
     }
 
     if (channelType === 'meetings') {
-      const meetingsData = await I2WEService.getMyMeetings().catch(() => []);
+      const meetingsData = await I2WeService.getMyMeetings().catch(() => []);
       setMeetings(meetingsData);
       setLinks([]);
       setDeals([]);
@@ -130,17 +130,17 @@ export default function ChannelDetailScreen() {
   const getDisplayDescription = (targetChannel: Channel) => {
     const normalizedSlug = (targetChannel.slug || '').toLowerCase();
     const normalizedName = (targetChannel.name || '').toLowerCase();
-    const isI2WEChannel =
-      normalizedSlug.includes('i2we') ||
+    const isI2WeChannel =
+      normalizedSlug.includes('i2We') ||
       normalizedSlug.includes('12we') ||
       normalizedSlug.includes('meeting') ||
-      normalizedName.includes('i2we') ||
+      normalizedName.includes('i2We') ||
       normalizedName.includes('meeting');
     const isLinksChannel =
       normalizedSlug === 'links' || normalizedName === 'links';
 
-    if (isI2WEChannel) return 'Track one-on-one meetings';
-    if (isLinksChannel) return 'Share Links Easily';
+    if (isI2WeChannel) return 'Track i2We meetings';
+    if (isLinksChannel) return 'Share business links and opportunities';
     return targetChannel.description;
   };
 
@@ -440,7 +440,7 @@ export default function ChannelDetailScreen() {
               ) : (
                 meetings.map((meeting) => (
                   <View key={meeting.id} style={styles.postCard}>
-                    <Text style={styles.postTitle}>I2WE Meeting</Text>
+                    <Text style={styles.postTitle}>i2We Meeting</Text>
                     <Text style={styles.postContent}>Status: {meeting.status}</Text>
                     <Text style={styles.postContent}>
                       Date: {new Date(meeting.meeting_date).toLocaleDateString()}

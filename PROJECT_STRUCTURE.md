@@ -98,7 +98,7 @@ project/
 - AI-powered conversational interface
 - Member discovery and networking
 - Channels for different verticals
-- Links, Deals, and I2WE meetings
+- Links, Deals, and i2We meetings
 - Attendance status display for Inner Circle members
 
 ### GHM Portal
@@ -119,7 +119,7 @@ project/
 - `virtual_memberships`: Virtual memberships
 - `core_links`: Member connections (house-specific)
 - `core_deals`: Business deals (house or network-wide)
-- `core_i2we`: One-on-one meetings (house-specific)
+- `core_i2we`: i2We meetings (house-specific)
 - `channels`: Content channels
 - `channel_posts`: Channel content
 
@@ -177,7 +177,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 Apply all migrations in order:
 
 1. Create core tables and channels
-2. Update links, deals, i2we with house restrictions
+2. Update links, deals, i2We with house restrictions
 3. Add GHM admin features (attendance, approvals, audit)
 
 Use Supabase CLI or dashboard to apply migrations from `supabase/migrations/`.

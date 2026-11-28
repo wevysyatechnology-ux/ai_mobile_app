@@ -15,7 +15,7 @@ import { AIService } from '@/services/aiService';
 import { speechService } from '@/services/speechService';
 import { LinksService } from '@/services/linksService';
 import { DealsService } from '@/services/dealsService';
-import { I2WEService } from '@/services/i2weService';
+import { I2WeService } from '@/services/i2weService';
 import { voiceOS } from '@/services/voiceOSService';
 import { actionEngine } from '@/services/actionEngine';
 import { knowledgeService } from '@/services/knowledgeService';
@@ -42,7 +42,7 @@ export default function Home() {
         LinksService.getLinksGivenCount(),
         LinksService.getLinksReceivedCount(),
         DealsService.getClosedDealsCount(),
-        I2WEService.getMeetingsCount(),
+        I2WeService.getMeetingsCount(),
         ActivityService.getRecentActivities(3),
       ]);
 
@@ -65,7 +65,7 @@ export default function Home() {
         router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: 'deals' } });
         break;
       case 'connect':
-        router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: '12we-meetings' } });
+        router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: 'i2we-meetings' } });
         break;
       case 'events':
         router.push('/event-meetings' as any);
@@ -195,7 +195,7 @@ export default function Home() {
             <View style={styles.actionIconBox}>
               <Users size={28} color={colors.accent_green_bright} strokeWidth={2.5} />
             </View>
-            <Text style={styles.actionTitle}>i2we</Text>
+            <Text style={styles.actionTitle}>i2We</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

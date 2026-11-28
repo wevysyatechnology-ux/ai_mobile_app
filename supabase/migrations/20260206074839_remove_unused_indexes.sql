@@ -30,7 +30,7 @@
   #### Core House Members Table
   - `idx_core_house_members_house_id` - Not being used by queries
 
-  #### Core I2WE Table
+  #### Core i2We Table
   - `idx_core_i2we_house_id` - Not being used by queries
   - `idx_core_i2we_member_1_id` - Not being used by queries
   - `idx_core_i2we_member_2_id` - Not being used by queries
@@ -46,7 +46,7 @@
   #### Houses Table
   - `idx_houses_created_by` - Not being used by queries
 
-  #### I2WE Events Table
+  #### i2We Events Table
   - `idx_i2we_events_created_by` - Not being used by queries
   - `idx_i2we_events_member_id` - Not being used by queries
 

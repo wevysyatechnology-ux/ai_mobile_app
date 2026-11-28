@@ -138,7 +138,7 @@ Members receive notification and can:
   },
 
   {
-    content: `I2We (I-to-We) are structured one-on-one meetings between members:
+    content: `i2We (I-to-We) are structured meetings between members:
 
 Purpose:
 - Deep-dive business discussions
@@ -146,9 +146,9 @@ Purpose:
 - Partnership negotiations
 - Knowledge transfer
 
-How to create an I2We:
+How to create an i2We:
 1. Go to Activity tab
-2. Click "Create I2We"
+2. Click "Create i2We"
 3. Select member from your house
 4. Choose date and time
 5. Set agenda/topic
@@ -165,8 +165,8 @@ Best practices:
 - Respect scheduled time
 - Follow up with action items`,
     metadata: {
-      title: 'What are I2We Meetings?',
-      category: 'i2we',
+      title: 'What are i2We Meetings?',
+      category: 'i2We',
       source: 'user_guide',
     },
   },
@@ -191,9 +191,9 @@ You can use voice commands for:
    "Send a link request to Rajesh"
    "Connect me with tax experts"
 
-4. CREATE I2WE:
+4. CREATE i2We:
    "Schedule a meeting with Priya"
-   "Create an I2We for next Tuesday"
+   "Create an i2We for next Tuesday"
 
 5. VIEW ACTIVITY:
    "Show my recent activity"
@@ -396,7 +396,7 @@ async function loadKnowledgeBase() {
   console.log('Users can ask questions like:');
   console.log('  - "What is WeVysya?"');
   console.log('  - "How do I post a deal?"');
-  console.log('  - "What are I2We meetings?"');
+  console.log('  - "What are i2We meetings?"');
   console.log('  - "How do I upgrade my membership?"');
   console.log('\nNext step: Deploy classify-intent function and test complete flow!');
 }

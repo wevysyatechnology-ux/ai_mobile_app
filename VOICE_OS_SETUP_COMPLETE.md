@@ -104,7 +104,7 @@ npx ts-node scripts/load-knowledge-base.ts
 This populates your knowledge base with:
 - Platform information (What is WeVysya?)
 - Membership types (GUEST, MEMBER, PRIME)
-- Features (Deals, Links, I2We, Houses)
+- Features (Deals, Links, i2We, Houses)
 - Voice commands
 - FAQs
 - Community guidelines
@@ -152,7 +152,7 @@ This tests:
    - "Find a CA in Bangalore"
    - "Show me all deals"
    - "Send a link request to Rajesh"
-   - "Create an I2We meeting"
+   - "Create an i2We meeting"
 
 4. **Expected flow**:
    ```
@@ -260,7 +260,7 @@ async function processCommand(transcript: string) {
 ### Feature Questions
 - "How do I post a deal?"
 - "What are link requests?"
-- "What are I2We meetings?"
+- "What are i2We meetings?"
 - "How do houses work?"
 
 ### Action Commands
@@ -270,7 +270,7 @@ async function processCommand(transcript: string) {
 - "Post a deal to sell laptops"
 - "Create a partnership opportunity"
 - "Send a link request to connect with tax experts"
-- "Schedule an I2We meeting"
+- "Schedule an i2We meeting"
 
 ---
 

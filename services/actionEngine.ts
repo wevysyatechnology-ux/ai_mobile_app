@@ -62,11 +62,11 @@ class ActionEngine {
       description: 'Send a link request to connect people',
     });
 
-    // i2we actions
+    // i2We actions
     this.actionMap.set('create_i2we', {
-      handler: this.createI2we,
+      handler: this.createI2We,
       screen: '/i2we-form',
-      description: 'Create an i2we connection request',
+      description: 'Create an i2We connection request',
     });
 
     // Profile actions
@@ -228,7 +228,7 @@ class ActionEngine {
         type: 'action',
         category: 'create_i2we',
         action: { name: 'create_i2we', parameters: {}, screen: '/i2we-form' },
-        response: 'Opening the i2we creation form.',
+        response: 'Opening the i2We creation form.',
         confidence: 0.90,
       };
     }
@@ -451,7 +451,7 @@ class ActionEngine {
     };
   }
 
-  private async createI2we(params: any): Promise<any> {
+  private async createI2We(params: any): Promise<any> {
     return {
       success: true,
       navigation: true,

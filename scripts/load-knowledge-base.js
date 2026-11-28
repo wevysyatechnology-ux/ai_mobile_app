@@ -154,7 +154,7 @@ Members receive notification and can:
   },
 
   {
-    content: `I2We (I-to-We) are structured one-on-one meetings between members:
+    content: `i2We (I-to-We) are structured meetings between members:
 
 Purpose:
 - Deep-dive business discussions

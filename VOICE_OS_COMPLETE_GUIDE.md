@@ -304,7 +304,7 @@ testVoiceOS();
 
 ### I2WE Actions:
 - "Create an i2we meeting"
-- "Schedule a one-on-one"
+- "Schedule an i2We meeting"
 - "Request a meeting"
 
 ### Profile & Navigation:

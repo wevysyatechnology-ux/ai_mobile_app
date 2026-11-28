@@ -63,7 +63,7 @@ export function ChannelCard({
     (channel.name || '').toLowerCase().includes('meeting');
 
   const displayDescription = descriptionOverride ||
-    (isI2WEChannel ? 'Track one-on-one meetings' : channel.description);
+    (isI2WEChannel ? 'Track i2We meetings' : channel.description);
 
   return (
     <TouchableOpacity

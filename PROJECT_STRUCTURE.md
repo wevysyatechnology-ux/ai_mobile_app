@@ -119,7 +119,7 @@ project/
 - `virtual_memberships`: Virtual memberships
 - `core_links`: Member connections (house-specific)
 - `core_deals`: Business deals (house or network-wide)
-- `core_i2we`: One-on-one meetings (house-specific)
+- `core_i2we`: i2We meetings (house-specific)
 - `channels`: Content channels
 - `channel_posts`: Channel content
 

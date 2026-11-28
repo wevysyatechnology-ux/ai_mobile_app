@@ -65,7 +65,7 @@ export default function Home() {
         router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: 'deals' } });
         break;
       case 'connect':
-        router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: '12we-meetings' } });
+        router.push({ pathname: '/channel-detail', params: { channelId: '', channelSlug: 'i2we-meetings' } });
         break;
       case 'events':
         router.push('/event-meetings' as any);

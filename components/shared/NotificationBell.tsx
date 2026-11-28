@@ -165,12 +165,12 @@ export function NotificationBell() {
         } as any);
         break;
 
-      // ── I2WE meetings → 12we-meetings channel-detail ────────────────
+      // ── I2WE meetings → i2we-meetings channel-detail ────────────────
       case 'i2we_meeting_scheduled':
       case 'i2we_meeting_recorded':
         router.push({
           pathname: '/channel-detail',
-          params: { channelId: '', channelSlug: '12we-meetings' },
+          params: { channelId: '', channelSlug: 'i2we-meetings' },
         } as any);
         break;
 

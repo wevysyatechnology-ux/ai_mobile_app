@@ -139,7 +139,7 @@ export default function ChannelDetailScreen() {
     const isLinksChannel =
       normalizedSlug === 'links' || normalizedName === 'links';
 
-    if (isI2WEChannel) return 'Track one-on-one meetings';
+    if (isI2WEChannel) return 'Track i2We meetings';
     if (isLinksChannel) return 'Share Links Easily';
     return targetChannel.description;
   };

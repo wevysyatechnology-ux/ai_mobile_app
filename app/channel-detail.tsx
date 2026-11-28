@@ -22,6 +22,8 @@ import { EventsService, EventMeeting } from '@/services/eventsService';
 import { Channel, ChannelPost, CoreDeal, CoreI2WE, CoreLink } from '@/types/database';
 import { useAuth } from '@/contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '@/constants/theme';
+import DevelopedByFooter from '@/components/shared/DevelopedByFooter';
+import PostCard from '@/components/channels/PostCard';
 import { supabase } from '@/lib/supabase';
 import { format, isToday, isTomorrow } from 'date-fns';
 
@@ -670,17 +672,16 @@ export default function ChannelDetailScreen() {
                 </View>
               ) : (
                 posts.map((post) => (
-                  <View key={post.id} style={styles.postCard}>
-                    <Text style={styles.postTitle}>{post.title}</Text>
-                    {post.content && <Text style={styles.postContent}>{post.content}</Text>}
-                    <Text style={styles.postDate}>
-                      {new Date(post.created_at).toLocaleDateString()}
-                    </Text>
-                  </View>
+                  <PostCard
+                    key={post.id}
+                    post={{ ...post, author: (post as any).author ?? null }}
+                    currentUserId={user?.id ?? null}
+                  />
                 ))
               )}
             </>
           )}
+          <DevelopedByFooter />
         </View>
       </ScrollView>
 

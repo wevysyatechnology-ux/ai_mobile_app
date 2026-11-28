@@ -204,3 +204,40 @@ export interface ChannelPost {
   created_at: string;
   updated_at: string;
 }
+
+export interface PostAuthor {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  membership_code: string | null;
+  city: string | null;
+  state: string | null;
+  business_category: string | null;
+}
+
+export interface ChannelPostWithAuthor extends ChannelPost {
+  author: PostAuthor | null;
+}
+
+export interface ChannelPostReaction {
+  post_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+}
+
+export interface ReactionSummary {
+  emoji: string;
+  count: number;
+  reacted_by_me: boolean;
+}
+
+export interface ChannelPostComment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  author: PostAuthor | null;
+}
